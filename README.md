@@ -22,16 +22,38 @@
     1. 账户相关
         - accountservice.cpp/accountservice.h
             - 对service接口 accountmenu()
+            - 功能：
+                - void accountsearch(void);// 查询账户
+                - void accountchange(void);// 账户信息变更
+                - void signupaccount(void);// 注册账户
+                - void deleteaccount(void);// 删除账户
     2. 上机下机
         - loginout.cpp/loginout.h
             - 对service接口 logmenu()
+            - 功能：
+                - void login(void);// 上机
+                - void logout(void);// 下机
     3. 计费标准设定
         - billingstandard.cpp/billingstandard.h
             - 对service接口 billingmenu()
+            - 功能：
+                - void newstandard(void);// 新增计费标准
+                - void searchstandard(void);// 查询计费标准
+                - void changestandard(void);// 改动计费标准
+                - void deletestandard(void);// 删除计费标准
     4. 财务系统
         - financeservice.cpp/financeservice.h
             - 对service接口 financemenu()
+            - 功能：
+                - void newstandard(void);// 新增计费标准
+                - void searchstandard(void);// 查询计费标准
+                - void changestandard(void);// 改动计费标准
+                - void deletestandard(void);// 删除计费标准
     5. 查询统计
         - logsearch.cpp/logsearch.h
             - 对service接口 searchmenu()
+            - 功能：
+                - void totalsales(void);// 营业额与日志
+                - void uselogs(void);// 上下机日志
+                - void logprint(void);// 日志打印
 
