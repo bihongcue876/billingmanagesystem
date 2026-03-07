@@ -11,9 +11,25 @@
 
 ## 项目设计
 - 服务本体
+    - main.cpp
+    - menu.cpp/menu.h
+        - 对main接口 menu()
+    - 服务
+        - service.cpp/service.h
+            - 对menu接口 service1() service2() service3() service4() service5()
     1. 账户相关
+        - accountservice.cpp/accountservice.h
+            - 对service接口 accountmenu()
     2. 上机下机
+        - loginout.cpp/loginout.h
+            - 对service接口 logmenu()
     3. 计费标准设定
+        - billingstandard.cpp/billingstandard.h
+            - 对service接口 billingmenu()
     4. 财务系统
+        - financeservice.cpp/financeservice.h
+            - 对service接口 financemenu()
     5. 查询统计
+        - logsearch.cpp/logsearch.h
+            - 对service接口 searchmenu()
 

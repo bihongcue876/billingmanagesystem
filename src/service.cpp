@@ -9,17 +9,17 @@
 using namespace std;
 
 void service1(){
-
+    accountmenu();
 }
 void service2(){
-
+    logmenu();
 }
 void service3(){
-
+    billingmenu();
 }
 void service4(){
-
+    financemenu();
 }
 void service5(){
-
+    searchmenu();
 }
