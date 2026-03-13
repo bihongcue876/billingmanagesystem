@@ -33,7 +33,7 @@
         - service.cpp/service.h
             - 对menu接口 service1() service2() service3() service4() service5()
     - 数据库和数据服务
-        - 
+        - 使用sqlitecpp（适合cpp）
     1. 账户相关 --> 对应card_service.h
         - accountservice.cpp/accountservice.h
             - 对service接口 accountmenu()
@@ -42,6 +42,7 @@
                 - void accountchange(void);// 账户信息变更
                 - void signupaccount(void);// 注册账户
                 - void deleteaccount(void);// 注销账户
+        - accountservice.cpp/accountservice.h
 
     2. 上机下机
         - loginout.cpp/loginout.h
@@ -76,10 +77,54 @@
 ### 信息表单（结构体数组设计卡务）
 1. 卡务信息
 
+|字段|类型|描述|
+| --- | --- | --- |
+|aName|string|卡号，不能为空，1~18字符|
+|aPwd|string|密码，不能为空|
+|nStatus|int|卡状态（0-未上机，1-上机中，2-已注销，3-失效）|
+|tStart|时间|开卡时间|
+|tEnd|时间|截止时间|
+|fTotalUse|float|累计金额|
+|tLast|时间|最后使用时间|
+|nUseCount|int|使用次数|
+|fBalance|float|余额|
+|nDel|int|删除标记：0,1|
+
 2. 计费信息
+
+|字段|类型|描述|
+| --- | --- | --- |
+|aCardName|string|卡号|
+|tStart|time|上机时间|
+|tEnd|time|下机时间|
+|fAmount|float|金额|
+|nStatus|int|卡状态（0-未结算，1-已结算）|
+|nDel|int|删除（0,1）|
 
 3. 计费标准信息
 
+|字段|类型|描述|
+| --- | --- | --- |
+|starttime|int|开始时间|
+|endtime|int|结束时间|
+|unit|int|最小计费单元|
+|charge|float|计费单元收费|
+|ratetype|int|计费类别（0-一般，1-包夜，2-包日，3-月VIP，4-年VIP）|
+|del|int|删除标记（0,1）|
+
 4. 充值退费信息
 
+|字段|类型|可为空|描述|
+| --- | --- | --- | --- |
+|cardName|char(16)|false|卡号|
+|operationtime|time_t|true|操作时间|
+|operation|int|true|操作类别（0-充值，1-退费）|
+|del|int|false|删除标志：0,1|
+
 5. 管理员
+
+|字段|类型|可为空|描述|
+| --- | --- | --- | --- |
+|name|char(16)|false|用户名|
+|pwd|char(8)|true|password|
+|privilege|int|false|删除标记：0,1|
