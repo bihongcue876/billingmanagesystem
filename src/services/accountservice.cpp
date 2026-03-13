@@ -76,10 +76,13 @@ void accountsearch(void){
     switch(status){
         case 0:
             cout<<"卡信息未找到"<<endl;
+            break;
         case 1:
             cout<<"已找到卡信息"<<endl;
+            break;
         case 2:
             cout<<"账户已删除"<<endl;
+            break;
         default:
             cout<<"出现异常"<<endl;
             break;

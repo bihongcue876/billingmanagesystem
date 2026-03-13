@@ -154,3 +154,12 @@
     - 编译：cmake --build build
 - 相关文件：CMakeLists.txt
 - 生成目录：build
+
+## 数据库详情
+- 存储位置：data文件夹
+- 对接方式：sqlite3
+- 数据库名：
+    - account.db - 账户
+    - standard.db - 计费标准
+    - bills.db - 账单
+    - logs.db - 记录（按照年月分表）

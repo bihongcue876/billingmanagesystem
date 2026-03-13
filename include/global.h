@@ -2,5 +2,4 @@
 #define GLOBAL_H //全局变量
 
 
-
 #endif

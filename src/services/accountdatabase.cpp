@@ -23,7 +23,7 @@ typedef struct Account{
 
 int searchaccount(char* cardname){
 
-}
+} // 查找账户
 
 void changeaccount(char* cardname){
 
@@ -34,5 +34,5 @@ void signup(void){
 } // 注册
 
 void deletecard(char* cardname){
-    
+
 } // 删除
