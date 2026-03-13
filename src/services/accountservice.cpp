@@ -47,7 +47,7 @@ void accountmenu(void){
 }
 
 void accountsearch(void){
-
+    
 }// 查询账户
 
 void accountchange(void){
