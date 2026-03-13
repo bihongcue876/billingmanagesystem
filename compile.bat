@@ -1,1 +1,1 @@
-g++ src/*.cpp -o system
+g++ src/*.cpp src/services/*.cpp -o system
