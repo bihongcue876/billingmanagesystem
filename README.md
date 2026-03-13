@@ -150,6 +150,7 @@
 ## 编译与组织方式改动 2026年3月13日
 - 构建方式：CMake
 - 编译指令：
-    - cmake -S . -B build
-    - cmake --build build
-    
+    - 初步设置：cmake -S . -B build -G "MinGW Makefiles"
+    - 编译：cmake --build build
+- 相关文件：CMakeLists.txt
+- 生成目录：build

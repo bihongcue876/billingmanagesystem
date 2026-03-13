@@ -35,6 +35,9 @@ file(GLOB_RECURSE C_SOURCES
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${CPP_SOURCES} ${C_SOURCES})
 
+get_target_property(OUT_DIR ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+message(STATUS "Runtime output directory for ${PROJECT_NAME}: ${OUT_DIR}")
+
 # 设置目标属性
 target_compile_definitions(${PROJECT_NAME} PRIVATE 
     _CRT_SECURE_NO_WARNINGS

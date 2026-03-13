@@ -1,5 +1,8 @@
 #include <iostream>
-#include <string>
+#include <cstring>
+#include <ctime>
+#include "sqlite3.h"
+#include "model.h"
 #include "accountservice.h"
 #include "accountdatabase.h"
 
@@ -46,7 +49,29 @@ void accountmenu(void){
     }
 }
 
+/*
+typedef struct Account{
+    char aName[18]; //卡号
+    char aPwd[8]; //密码
+    int nStatus; //卡状态
+    time_t tStart; //开卡时间
+    time_t tEnd; //截止时间
+    float fTotalUse; //累计金额
+    time_t tLast; // 最后使用时间
+    int nUseCount; //使用次数
+    float fBalance; //余额
+    int nDel; // 删除标记
+}Account; //账户类
+*/
+
+
+
 void accountsearch(void){
+    cout<<"--------卡号查询--------"<<endl;
+    cout<<"请输入需要查询的卡号：";
+    char idn[18]; // 卡号
+    cin>>idn[18];
+    searchaccount(idn);
     
 }// 查询账户
 
@@ -61,3 +86,7 @@ void signupaccount(void){
 void deleteaccount(void){
 
 }// 注销账户
+
+int searchaccount(char* cardname){
+
+}
