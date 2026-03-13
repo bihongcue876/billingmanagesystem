@@ -4,6 +4,8 @@
 #include "accountdatabase.h"
 #include "model.h"
 
+using namespace std;
+
 /*
 typedef struct Account{
     char aName[18]; //卡号
@@ -20,5 +22,17 @@ typedef struct Account{
 */
 
 int searchaccount(char* cardname){
-    
+
 }
+
+void changeaccount(char* cardname){
+
+} // 改动账户
+
+void signup(void){
+
+} // 注册
+
+void deletecard(char* cardname){
+    
+} // 删除

@@ -71,22 +71,39 @@ void accountsearch(void){
     cout<<"请输入需要查询的卡号：";
     char idn[18]; // 卡号
     cin>>idn[18];
-    searchaccount(idn);
-    
+    int status;
+    status=searchaccount(idn);
+    switch(status){
+        case 0:
+            cout<<"卡信息未找到"<<endl;
+        case 1:
+            cout<<"已找到卡信息"<<endl;
+        case 2:
+            cout<<"账户已删除"<<endl;
+        default:
+            cout<<"出现异常"<<endl;
+            break;
+    }
+    cout<<"查询完毕"<<endl<<endl;
 }// 查询账户
 
 void accountchange(void){
-
+    cout<<"--------信息更改--------"<<endl;
+    cout<<"请输入需要更改的卡号：";
+    char idn[18]; // 卡号
+    cin>>idn[18];
+    changeaccount(idn);
 }// 账户信息变更
 
 void signupaccount(void){
-
+    cout<<"--------注册--------"<<endl;
+    signup();
 }// 注册账户
 
 void deleteaccount(void){
-
+    cout<<"--------注销--------"<<endl;
+    cout<<"请输入需要注销的卡号：";
+    char idn[18]; // 卡号
+    cin>>idn[18];
+    deletecard(idn);
 }// 注销账户
-
-int searchaccount(char* cardname){
-
-}
