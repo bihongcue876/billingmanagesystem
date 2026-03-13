@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../headfile/logsearch.h"
+#include "logsearch.h"
 
 using namespace std;
 

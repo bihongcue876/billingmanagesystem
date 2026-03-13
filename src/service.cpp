@@ -1,10 +1,10 @@
 #include <iostream>
-#include "headfile/service.h"
-#include "headfile/accountservice.h"
-#include "headfile/billingstandard.h"
-#include "headfile/financeservice.h"
-#include "headfile/loginout.h"
-#include "headfile/logsearch.h"
+#include "service.h"
+#include "accountservice.h"
+#include "billingstandard.h"
+#include "financeservice.h"
+#include "loginout.h"
+#include "logsearch.h"
 
 using namespace std;
 

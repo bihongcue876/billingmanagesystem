@@ -1,0 +1,42 @@
+#include <ctime>
+#include <iostream>
+#ifndef MODEL_H
+#define MODEL_H
+
+typedef struct Account{
+    char aName[18]; //卡号
+    char aPwd[8]; //密码
+    int nStatus; //卡状态
+    time_t tStart; //开卡时间
+    time_t tEnd; //截止时间
+    float fTotalUse; //累计金额
+    time_t tLast; // 最后使用时间
+    int nUseCount; //使用次数
+    float fBalance; //余额
+    int nDel; // 删除标记
+}Account; //账户类
+
+typedef struct Billing{
+    char aCardName[18];
+    time_t tStart; // 上机时间
+    time_t tEnd; // 下机时间
+    float fAmount; // 消费金额
+    int nStatus; // 消费状态 0,1
+    int nDel; // 删除表示 0,1
+}Billing; // 计费信息
+
+typedef struct LononInfo{
+    char aCardName[18]; // 上机卡号
+    time_t tLogon; // 上机时间
+    float fBalance; // 上机余额
+}LogonInfo; // 上机信息
+
+typedef struct SettleInfo{
+    char aCardName[18]; //卡号
+    time_t tStart; // 上机时间
+    time_t tEnd; // 下机时间
+    float fAmount; // 消费金额
+    float fBalance; // 余额
+}SettleInfo; // 下机信息
+
+#endif

@@ -82,10 +82,10 @@
 |aName|string|卡号，不能为空，1~18字符|
 |aPwd|string|密码，不能为空|
 |nStatus|int|卡状态（0-未上机，1-上机中，2-已注销，3-失效）|
-|tStart|时间|开卡时间|
-|tEnd|时间|截止时间|
+|tStart|time_t|开卡时间|
+|tEnd|time_t|截止时间|
 |fTotalUse|float|累计金额|
-|tLast|时间|最后使用时间|
+|tLast|time_t|最后使用时间|
 |nUseCount|int|使用次数|
 |fBalance|float|余额|
 |nDel|int|删除标记：0,1|
@@ -95,8 +95,8 @@
 |字段|类型|描述|
 | --- | --- | --- |
 |aCardName|string|卡号|
-|tStart|time|上机时间|
-|tEnd|time|下机时间|
+|tStart|time_t|上机时间|
+|tEnd|time_t|下机时间|
 |fAmount|float|金额|
 |nStatus|int|卡状态（0-未结算，1-已结算）|
 |nDel|int|删除（0,1）|
@@ -105,8 +105,8 @@
 
 |字段|类型|描述|
 | --- | --- | --- |
-|starttime|int|开始时间|
-|endtime|int|结束时间|
+|starttime|time_t|开始时间|
+|endtime|time_t|结束时间|
 |unit|int|最小计费单元|
 |charge|float|计费单元收费|
 |ratetype|int|计费类别（0-一般，1-包夜，2-包日，3-月VIP，4-年VIP）|
@@ -116,7 +116,7 @@
 
 |字段|类型|可为空|描述|
 | --- | --- | --- | --- |
-|cardName|char(16)|false|卡号|
+|cardName|string|false|卡号|
 |operationtime|time_t|true|操作时间|
 |operation|int|true|操作类别（0-充值，1-退费）|
 |del|int|false|删除标志：0,1|
@@ -125,6 +125,31 @@
 
 |字段|类型|可为空|描述|
 | --- | --- | --- | --- |
-|name|char(16)|false|用户名|
-|pwd|char(8)|true|password|
+|name|string|false|用户名|
+|pwd|string|true|password|
 |privilege|int|false|删除标记：0,1|
+
+6. 上机
+
+|字段|类型|描述|
+| --- | --- | --- |
+|aCardName|string|上机卡号|
+|tLogon|time_t|上机时间|
+|fBalance|float|上机余额|
+
+7. 下机
+
+|字段|类型|描述|
+| --- | --- | --- |
+|aCardName|string|卡号|
+|tStart|time_t|上机时间|
+|tEnd|time_t|下机时间|
+|fAmount|float|消费金额|
+|fBalance|float|余额|
+
+## 编译与组织方式改动 2026年3月13日
+- 构建方式：CMake
+- 编译指令：
+    - cmake -S . -B build
+    - cmake --build build
+    
