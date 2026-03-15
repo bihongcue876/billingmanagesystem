@@ -1,8 +1,16 @@
 # 计费管理系统
 
 - *(注意：这里面的主分支名为master而非main)，用于习惯新操作*
-- 注意：头文件将参与编译，如多次调用则会编译慢速。
+- 可执行文件地址：./build/bin/AccountManager.exe
+
+- 头文件将参与编译，如多次调用则会编译慢速。
 - 条件编译机制 #ifndef #define #endif
+
+- 上传平台：origin
+```bash
+git push -u gitee master
+git push -u github master
+```
 
 ## 前序安排
 - 使用compile.bat快速编译，即注意在cmd终端里面编译和运行。
