@@ -11,6 +11,7 @@
 git push -u gitee master
 git push -u github master
 ```
+- 项目运行方式：run.bat , 控制台：`run`
 
 ## 前序安排
 - 使用compile.bat快速编译，即注意在cmd终端里面编译和运行。
@@ -171,3 +172,8 @@ git push -u github master
     - standard.db - 计费标准
     - bills.db - 账单
     - logs.db - 记录（按照年月分表）
+
+## 其他预设
+- 第一个用户账号：
+    - username: 10000000
+    - password: 11111111

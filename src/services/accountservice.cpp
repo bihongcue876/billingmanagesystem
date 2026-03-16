@@ -70,7 +70,8 @@ void accountsearch(void){
     cout<<"--------卡号查询--------"<<endl;
     cout<<"请输入需要查询的卡号：";
     char idn[18]; // 卡号
-    cin>>idn[18];
+    cin.width(18);
+    cin>>idn;
     int status;
     status=searchaccount(idn);
     switch(status){
@@ -94,7 +95,8 @@ void accountchange(void){
     cout<<"--------信息更改--------"<<endl;
     cout<<"请输入需要更改的卡号：";
     char idn[18]; // 卡号
-    cin>>idn[18];
+    cin.width(18);
+    cin>>idn;
     changeaccount(idn);
 }// 账户信息变更
 
@@ -107,6 +109,7 @@ void deleteaccount(void){
     cout<<"--------注销--------"<<endl;
     cout<<"请输入需要注销的卡号：";
     char idn[18]; // 卡号
-    cin>>idn[18];
+    cin.width(18);
+    cin>>idn;
     deletecard(idn);
 }// 注销账户

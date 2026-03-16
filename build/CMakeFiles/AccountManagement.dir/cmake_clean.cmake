@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/AccountManagement.dir/src/Main.cpp.obj"
   "CMakeFiles/AccountManagement.dir/src/Main.cpp.obj.d"
+  "CMakeFiles/AccountManagement.dir/src/database.cpp.obj"
+  "CMakeFiles/AccountManagement.dir/src/database.cpp.obj.d"
   "CMakeFiles/AccountManagement.dir/src/menu.cpp.obj"
   "CMakeFiles/AccountManagement.dir/src/menu.cpp.obj.d"
   "CMakeFiles/AccountManagement.dir/src/service.cpp.obj"

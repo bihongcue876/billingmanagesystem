@@ -197,6 +197,30 @@ src/Main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/Main.cpp.s
 .PHONY : src/Main.cpp.s
 
+src/database.obj: src/database.cpp.obj
+.PHONY : src/database.obj
+
+# target to build an object file
+src/database.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/database.cpp.obj
+.PHONY : src/database.cpp.obj
+
+src/database.i: src/database.cpp.i
+.PHONY : src/database.i
+
+# target to preprocess a source file
+src/database.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/database.cpp.i
+.PHONY : src/database.cpp.i
+
+src/database.s: src/database.cpp.s
+.PHONY : src/database.s
+
+# target to generate assembly for a file
+src/database.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/database.cpp.s
+.PHONY : src/database.cpp.s
+
 src/menu.obj: src/menu.cpp.obj
 .PHONY : src/menu.obj
 
@@ -477,6 +501,9 @@ help:
 	@echo ... src/Main.obj
 	@echo ... src/Main.i
 	@echo ... src/Main.s
+	@echo ... src/database.obj
+	@echo ... src/database.i
+	@echo ... src/database.s
 	@echo ... src/menu.obj
 	@echo ... src/menu.i
 	@echo ... src/menu.s

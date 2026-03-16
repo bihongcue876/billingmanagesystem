@@ -1,5 +1,5 @@
-CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj: \
- D:\Projects\CPPProjs\accountmanagement\src\services\accountdatabase.cpp \
+CMakeFiles/AccountManagement.dir/src/database.cpp.obj: \
+ D:\Projects\CPPProjs\accountmanagement\src\database.cpp \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/iostream \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/bits/requires_hosted.h \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/x86_64-w64-mingw32/bits/c++config.h \
@@ -130,21 +130,18 @@ CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj: \
  D:/MinGW64/mingw64/x86_64-w64-mingw32/include/_timeval.h \
  D:/MinGW64/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
  D:/MinGW64/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+ D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/cstring \
+ D:/MinGW64/mingw64/x86_64-w64-mingw32/include/string.h \
+ D:/MinGW64/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
+ D:/Projects/CPPProjs/accountmanagement/src/sqlite3/sqlite3.h \
+ D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdarg.h \
+ D:/MinGW64/mingw64/x86_64-w64-mingw32/include/stdarg.h \
+ D:/MinGW64/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
+ D:/Projects/CPPProjs/accountmanagement/include/database.h \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/vector \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/bits/stl_uninitialized.h \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/bits/stl_vector.h \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/bits/stl_bvector.h \
  D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/bits/vector.tcc \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/conio.h \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/sec_api/conio_s.h \
- D:/Projects/CPPProjs/accountmanagement/src/sqlite3/sqlite3.h \
- D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdarg.h \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/stdarg.h \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
- D:/Projects/CPPProjs/accountmanagement/include/accountdatabase.h \
  D:/Projects/CPPProjs/accountmanagement/include/model.h \
- D:/Projects/CPPProjs/accountmanagement/include/database.h \
- D:/MinGW64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/c++/cstring \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/string.h \
- D:/MinGW64/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
  D:/Projects/CPPProjs/accountmanagement/include/model.h

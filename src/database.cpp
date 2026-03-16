@@ -3,7 +3,7 @@
 #include <cstring>
 #include "sqlite3.h"
 #include "database.h"
-
+#include "model.h"
 
 using namespace std;
 
@@ -17,7 +17,8 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
 
 
 sqlitedb::sqlitedb(const char* dbPath){
-    int rc = sqlite3_open(dbPath,&db);
+    string fullPath = string(DATA_ROOT) + dbPath;
+    int rc = sqlite3_open(fullPath.c_str(),&db);
     if(rc){
         string err = sqlite3_errmsg(db);
         sqlite3_close(db);
@@ -41,13 +42,29 @@ void sqlitedb::bindParams(sqlite3_stmt* stmt, const std::vector<const char*>& pa
     }
 } // 绑定列表参数
 
-bool sqlitedb::exec(const char* sql,const std::vector<const char*>& params={}){
+bool sqlitedb::exec(const char* sql,const std::vector<const char*>& params){
     sqlite3_stmt* stmt = nullptr;
     const char* tail=nullptr;
     int rc = sqlite3_prepare_v2(db,sql,-1,&stmt,&tail);
+    if (rc != SQLITE_OK) {
+        lastError = sqlite3_errmsg(db);
+        return false;
+    }
+    // 绑定参数
+    bindParams(stmt, params);
+    // 执行语句
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        lastError = sqlite3_errmsg(db);
+        sqlite3_finalize(stmt);
+        return false;
+    }
+    // 销毁预编译语句
+    sqlite3_finalize(stmt);
+    return true;
 }//执行不返回数据的SQL
 
-std::vector<std::vector<std::string>> sqlitedb::query(const char* sql,const std::vector<const char*>& params={}){
+std::vector<std::vector<std::string>> sqlitedb::query(const char* sql,const std::vector<const char*>& params){
     std::vector<std::vector<std::string>> result; // 存储最终结果集的二维向量
     sqlite3_stmt* stmt = nullptr;                  // 预编译语句对象指针
     const char* tail = nullptr;                    // 未使用的 SQL 尾部（忽略）
@@ -109,10 +126,25 @@ bool sqlitedb::insert(const char* tableName, const std::vector<const char*>& col
     }
     sql += ");";
 
-    return exec(sql.c_str(), values);
+    sqlite3_stmt* stmt = nullptr;
+    const char* tail = nullptr;
+    int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, &tail);
+    if (rc != SQLITE_OK) {
+        lastError = sqlite3_errmsg(db);
+        return false;
+    }
+    bindParams(stmt, values);
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        lastError = sqlite3_errmsg(db);
+        sqlite3_finalize(stmt);
+        return false;
+    }
+    sqlite3_finalize(stmt);
+    return true;
 }//Insert
 
-bool sqlitedb::update(const char* tableName, const char* setClause, const char* whereClause, const std::vector<const char*>& params = {}){
+bool sqlitedb::update(const char* tableName, const char* setClause, const char* whereClause, const std::vector<const char*>& params){
     std::string sql = "UPDATE ";
     sql += tableName;
     sql += " SET ";
@@ -125,7 +157,7 @@ bool sqlitedb::update(const char* tableName, const char* setClause, const char* 
     return exec(sql.c_str(), params);
 }// 更改更新
 
-bool sqlitedb::remove(const char* tableName, const char* whereClause, const std::vector<const char*>& params = {}){
+bool sqlitedb::remove(const char* tableName, const char* whereClause, const std::vector<const char*>& params){
     std::string sql = "DELETE FROM ";
     sql += tableName;
     if (whereClause && *whereClause) {
@@ -135,5 +167,32 @@ bool sqlitedb::remove(const char* tableName, const char* whereClause, const std:
     sql += ";";
     return exec(sql.c_str(), params);
 } // 删除
+
+Account queryToAccount(const vector<vector<string>>& result, int index){
+    Account acc;
+    if(result.empty() || index >= (int)result.size()){
+        memset(&acc, 0, sizeof(Account));
+        return acc;
+    }
+    const vector<string>& row = result[index];
+    if(row.size() < 10){
+        memset(&acc, 0, sizeof(Account));
+        return acc;
+    }
+    strncpy(acc.aName, row[0].c_str(), 18);
+    acc.aName[18] = '\0';
+    strncpy(acc.aPwd, row[1].c_str(), 8);
+    acc.aPwd[8] = '\0';
+    strncpy(acc.nStatus, row[2].c_str(), 1);
+    acc.nStatus[1] = '\0';
+    acc.tStart = stol(row[3]);
+    acc.tEnd = stol(row[4]);
+    acc.fTotalUse = stof(row[5]);
+    acc.tLast = stol(row[6]);
+    acc.nUseCount = stoi(row[7]);
+    acc.fBalance = stof(row[8]);
+    acc.nDel = stoi(row[9]);
+    return acc;
+} //转为Account对象
 
 

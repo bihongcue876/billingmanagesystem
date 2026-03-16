@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <stdexcept>
+#include "model.h"
 #define DATA_ROOT "data/" //默认数据库地址（可能无法连接，若如此则直接在可执行文件同使用
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);
@@ -28,5 +29,7 @@ private:
 
     void bindParams(sqlite3_stmt* stmt, const std::vector<const char*>& params);//绑定参数，参数列表const char*的vector
 };
+
+Account queryToAccount(const std::vector<std::vector<std::string>>& result, int index = 0);
 
 #endif // DATABASE_H

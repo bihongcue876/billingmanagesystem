@@ -4,9 +4,9 @@
 #define MODEL_H
 
 typedef struct Account{
-    char aName[18]; //卡号
-    char aPwd[8]; //密码
-    int nStatus; //卡状态
+    char aName[19]; //卡号
+    char aPwd[9]; //密码
+    char nStatus[2]; //卡状态
     time_t tStart; //开卡时间
     time_t tEnd; //截止时间
     float fTotalUse; //累计金额
@@ -17,7 +17,7 @@ typedef struct Account{
 }Account; //账户类
 
 typedef struct Billing{
-    char aCardName[18];
+    char aCardName[19];
     time_t tStart; // 上机时间
     time_t tEnd; // 下机时间
     float fAmount; // 消费金额
@@ -26,13 +26,13 @@ typedef struct Billing{
 }Billing; // 计费信息
 
 typedef struct LononInfo{
-    char aCardName[18]; // 上机卡号
+    char aCardName[19]; // 上机卡号
     time_t tLogon; // 上机时间
     float fBalance; // 上机余额
 }LogonInfo; // 上机信息
 
 typedef struct SettleInfo{
-    char aCardName[18]; //卡号
+    char aCardName[19]; //卡号
     time_t tStart; // 上机时间
     time_t tEnd; // 下机时间
     float fAmount; // 消费金额

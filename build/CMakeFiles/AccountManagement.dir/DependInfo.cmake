@@ -11,6 +11,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "D:/Projects/CPPProjs/accountmanagement/src/sqlite3/shell.c" "CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj.d"
   "D:/Projects/CPPProjs/accountmanagement/src/sqlite3/sqlite3.c" "CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj.d"
   "D:/Projects/CPPProjs/accountmanagement/src/Main.cpp" "CMakeFiles/AccountManagement.dir/src/Main.cpp.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/Main.cpp.obj.d"
+  "D:/Projects/CPPProjs/accountmanagement/src/database.cpp" "CMakeFiles/AccountManagement.dir/src/database.cpp.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/database.cpp.obj.d"
   "D:/Projects/CPPProjs/accountmanagement/src/menu.cpp" "CMakeFiles/AccountManagement.dir/src/menu.cpp.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/menu.cpp.obj.d"
   "D:/Projects/CPPProjs/accountmanagement/src/service.cpp" "CMakeFiles/AccountManagement.dir/src/service.cpp.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/service.cpp.obj.d"
   "D:/Projects/CPPProjs/accountmanagement/src/services/accountdatabase.cpp" "CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj" "gcc" "CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj.d"
