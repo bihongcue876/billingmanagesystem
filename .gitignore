@@ -1,0 +1,39 @@
+# Build directories (except build/bin)
+build/*
+!build/bin/
+!build/bin/*
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Makefiles
+Makefile
+*.make
+
+# Compiled Object files
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+
+# Executables (outside build/bin)
+*.exe
+*.out
+*.app
+
+# Database files
+data/*.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

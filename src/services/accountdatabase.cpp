@@ -13,7 +13,10 @@ using namespace std;
 
 sqlitedb accountdb("account.db");
 
-void init();
+void init(){
+    const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aName TEXT UNIQUE NOT NULL, aPwd TEXT NOT NULL, nStatus INTEGER, tStart INTEGER, tEnd INTEGER, fTotalUse REAL, tLast INTEGER, nUseCount INTEGER, fBalance REAL, nDel INTEGER";
+    accountdb.tablecreate("accounts", columnDefs);
+}
 
 string formatTime(time_t t) {
     struct tm* timeinfo = localtime(&t);
@@ -29,7 +32,7 @@ int searchaccount(char* cardname){
     if(result.empty()){
         return 0;
     }
-    Account acc = queryToAccount(result);
+    Account acc = queryToAccount(result, 0);
     
     // 格式化时间显示
     string lastTime = formatTime(acc.tLast);
@@ -110,6 +113,14 @@ void signup(void){
     cin.width(19);
     cin >> acc.aName;
     cin.ignore(1024,'\n');
+    
+    vector<const char*> checkParams = {acc.aName};
+    vector<vector<string>> checkResult = accountdb.query("SELECT aName FROM accounts WHERE aName=?", checkParams);
+    if(!checkResult.empty()){
+        cout << "账号已存在，不可重复注册！" << endl;
+        return;
+    }
+    
     cout << "请输入密码（最多8位）：";
     int pwdIndex = 0;
     char ch;
@@ -132,13 +143,28 @@ void signup(void){
     acc.fTotalUse = 0.0f;
     acc.tLast = acc.tStart;
     acc.nUseCount = 0;
-    acc.fBalance = 0.0f;
+    while(true){
+        cout << "请输入开卡金额：";
+        cin >> acc.fBalance;
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(1024, '\n');
+            cout << "输入格式错误，请重新输入！" << endl;
+            continue;
+        }
+        cin.ignore(1024, '\n');
+        if(acc.fBalance <= 0){
+            cout << "开卡金额太少，请重新输入！" << endl;
+        } else if(acc.fBalance > 1000){
+            cout << "开卡金额太多，请重新输入！" << endl;
+        } else {
+            break;
+        }
+    }
     acc.nDel = 0;
-    // 初始化卡状态为未上机
     acc.nStatus[0] = '0';
     acc.nStatus[1] = '\0';
     vector<const char*> columns = {"aName", "aPwd", "nStatus", "tStart", "tEnd", "fTotalUse", "tLast", "nUseCount", "fBalance", "nDel"};
-    // 使用局部 string 保存数值型字段，避免悬空指针
     string tStartStr   = to_string(acc.tStart);
     string tEndStr     = to_string(acc.tEnd);
     string totalUseStr = to_string(acc.fTotalUse);
@@ -186,9 +212,3 @@ void deletecard(char* cardname){
         cout << "注销失败：" << accountdb.getLastError() << endl;
     }
 } // 注销
-
-void init(){
-    const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aName TEXT UNIQUE NOT NULL, aPwd TEXT NOT NULL, nStatus INTEGER, tStart INTEGER, tEnd INTEGER, fTotalUse REAL, tLast INTEGER, nUseCount INTEGER, fBalance REAL, nDel INTEGER";
-    //列定义和写表格（如果没有则建表，如果有则不建表）
-    accountdb.tablecreate("accounts", columnDefs);
-} // 初始化检查

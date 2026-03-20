@@ -317,6 +317,30 @@ src/services/accountservice.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/accountservice.cpp.s
 .PHONY : src/services/accountservice.cpp.s
 
+src/services/billingdatabase.obj: src/services/billingdatabase.cpp.obj
+.PHONY : src/services/billingdatabase.obj
+
+# target to build an object file
+src/services/billingdatabase.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj
+.PHONY : src/services/billingdatabase.cpp.obj
+
+src/services/billingdatabase.i: src/services/billingdatabase.cpp.i
+.PHONY : src/services/billingdatabase.i
+
+# target to preprocess a source file
+src/services/billingdatabase.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.i
+.PHONY : src/services/billingdatabase.cpp.i
+
+src/services/billingdatabase.s: src/services/billingdatabase.cpp.s
+.PHONY : src/services/billingdatabase.s
+
+# target to generate assembly for a file
+src/services/billingdatabase.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.s
+.PHONY : src/services/billingdatabase.cpp.s
+
 src/services/billingstandard.obj: src/services/billingstandard.cpp.obj
 .PHONY : src/services/billingstandard.obj
 
@@ -388,6 +412,30 @@ src/services/loginout.s: src/services/loginout.cpp.s
 src/services/loginout.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.s
 .PHONY : src/services/loginout.cpp.s
+
+src/services/loginoutdata.obj: src/services/loginoutdata.cpp.obj
+.PHONY : src/services/loginoutdata.obj
+
+# target to build an object file
+src/services/loginoutdata.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj
+.PHONY : src/services/loginoutdata.cpp.obj
+
+src/services/loginoutdata.i: src/services/loginoutdata.cpp.i
+.PHONY : src/services/loginoutdata.i
+
+# target to preprocess a source file
+src/services/loginoutdata.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.i
+.PHONY : src/services/loginoutdata.cpp.i
+
+src/services/loginoutdata.s: src/services/loginoutdata.cpp.s
+.PHONY : src/services/loginoutdata.s
+
+# target to generate assembly for a file
+src/services/loginoutdata.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\AccountManagement.dir\build.make CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.s
+.PHONY : src/services/loginoutdata.cpp.s
 
 src/services/logsearch.obj: src/services/logsearch.cpp.obj
 .PHONY : src/services/logsearch.obj
@@ -516,6 +564,9 @@ help:
 	@echo ... src/services/accountservice.obj
 	@echo ... src/services/accountservice.i
 	@echo ... src/services/accountservice.s
+	@echo ... src/services/billingdatabase.obj
+	@echo ... src/services/billingdatabase.i
+	@echo ... src/services/billingdatabase.s
 	@echo ... src/services/billingstandard.obj
 	@echo ... src/services/billingstandard.i
 	@echo ... src/services/billingstandard.s
@@ -525,6 +576,9 @@ help:
 	@echo ... src/services/loginout.obj
 	@echo ... src/services/loginout.i
 	@echo ... src/services/loginout.s
+	@echo ... src/services/loginoutdata.obj
+	@echo ... src/services/loginoutdata.i
+	@echo ... src/services/loginoutdata.s
 	@echo ... src/services/logsearch.obj
 	@echo ... src/services/logsearch.i
 	@echo ... src/services/logsearch.s

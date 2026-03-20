@@ -161,11 +161,26 @@ CMakeFiles/AccountManagement.dir/src/services/accountservice.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/AccountManagement.dir/src/services/accountservice.cpp.s"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Projects\CPPProjs\accountmanagement\src\services\accountservice.cpp -o CMakeFiles\AccountManagement.dir\src\services\accountservice.cpp.s
 
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj: CMakeFiles/AccountManagement.dir/flags.make
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/billingdatabase.cpp
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\billingdatabase.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\billingdatabase.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\billingdatabase.cpp
+
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.i"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:\Projects\CPPProjs\accountmanagement\src\services\billingdatabase.cpp > CMakeFiles\AccountManagement.dir\src\services\billingdatabase.cpp.i
+
+CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.s"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Projects\CPPProjs\accountmanagement\src\services\billingdatabase.cpp -o CMakeFiles\AccountManagement.dir\src\services\billingdatabase.cpp.s
+
 CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj: CMakeFiles/AccountManagement.dir/flags.make
 CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
 CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/billingstandard.cpp
 CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\billingstandard.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\billingstandard.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\billingstandard.cpp
 
 CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.i: cmake_force
@@ -180,7 +195,7 @@ CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj: CMakeFiles
 CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
 CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/financeservice.cpp
 CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\financeservice.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\financeservice.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\financeservice.cpp
 
 CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.i: cmake_force
@@ -195,7 +210,7 @@ CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj: CMakeFiles/Accou
 CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
 CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/loginout.cpp
 CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\loginout.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\loginout.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\loginout.cpp
 
 CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.i: cmake_force
@@ -206,11 +221,26 @@ CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.s"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Projects\CPPProjs\accountmanagement\src\services\loginout.cpp -o CMakeFiles\AccountManagement.dir\src\services\loginout.cpp.s
 
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj: CMakeFiles/AccountManagement.dir/flags.make
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/loginoutdata.cpp
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\loginoutdata.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\loginoutdata.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\loginoutdata.cpp
+
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.i"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:\Projects\CPPProjs\accountmanagement\src\services\loginoutdata.cpp > CMakeFiles\AccountManagement.dir\src\services\loginoutdata.cpp.i
+
+CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.s"
+	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Projects\CPPProjs\accountmanagement\src\services\loginoutdata.cpp -o CMakeFiles\AccountManagement.dir\src\services\loginoutdata.cpp.s
+
 CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj: CMakeFiles/AccountManagement.dir/flags.make
 CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
 CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/services/logsearch.cpp
 CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\services\logsearch.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\services\logsearch.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\services\logsearch.cpp
 
 CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.i: cmake_force
@@ -225,7 +255,7 @@ CMakeFiles/AccountManagement.dir/src/tool.cpp.obj: CMakeFiles/AccountManagement.
 CMakeFiles/AccountManagement.dir/src/tool.cpp.obj: CMakeFiles/AccountManagement.dir/includes_CXX.rsp
 CMakeFiles/AccountManagement.dir/src/tool.cpp.obj: D:/Projects/CPPProjs/accountmanagement/src/tool.cpp
 CMakeFiles/AccountManagement.dir/src/tool.cpp.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/AccountManagement.dir/src/tool.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/AccountManagement.dir/src/tool.cpp.obj"
 	D:\MinGW64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/AccountManagement.dir/src/tool.cpp.obj -MF CMakeFiles\AccountManagement.dir\src\tool.cpp.obj.d -o CMakeFiles\AccountManagement.dir\src\tool.cpp.obj -c D:\Projects\CPPProjs\accountmanagement\src\tool.cpp
 
 CMakeFiles/AccountManagement.dir/src/tool.cpp.i: cmake_force
@@ -240,7 +270,7 @@ CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj: CMakeFiles/AccountMana
 CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj: CMakeFiles/AccountManagement.dir/includes_C.rsp
 CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj: D:/Projects/CPPProjs/accountmanagement/src/sqlite3/shell.c
 CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj"
 	D:\MinGW64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -fpermissive -MD -MT CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj -MF CMakeFiles\AccountManagement.dir\src\sqlite3\shell.c.obj.d -o CMakeFiles\AccountManagement.dir\src\sqlite3\shell.c.obj -c D:\Projects\CPPProjs\accountmanagement\src\sqlite3\shell.c
 
 CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.i: cmake_force
@@ -255,7 +285,7 @@ CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj: CMakeFiles/AccountMa
 CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj: CMakeFiles/AccountManagement.dir/includes_C.rsp
 CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj: D:/Projects/CPPProjs/accountmanagement/src/sqlite3/sqlite3.c
 CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj: CMakeFiles/AccountManagement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj"
 	D:\MinGW64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -fpermissive -MD -MT CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.obj -MF CMakeFiles\AccountManagement.dir\src\sqlite3\sqlite3.c.obj.d -o CMakeFiles\AccountManagement.dir\src\sqlite3\sqlite3.c.obj -c D:\Projects\CPPProjs\accountmanagement\src\sqlite3\sqlite3.c
 
 CMakeFiles/AccountManagement.dir/src/sqlite3/sqlite3.c.i: cmake_force
@@ -274,9 +304,11 @@ AccountManagement_OBJECTS = \
 "CMakeFiles/AccountManagement.dir/src/service.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/accountservice.cpp.obj" \
+"CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj" \
+"CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/tool.cpp.obj" \
 "CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj" \
@@ -291,9 +323,11 @@ bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/menu.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/service.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/accountdatabase.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/accountservice.cpp.obj
+bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/billingdatabase.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/billingstandard.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/financeservice.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/loginout.cpp.obj
+bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/loginoutdata.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/services/logsearch.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/tool.cpp.obj
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/src/sqlite3/shell.c.obj
@@ -302,7 +336,7 @@ bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/build.make
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/linkLibs.rsp
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/objects1.rsp
 bin/AccountManagement.exe: CMakeFiles/AccountManagement.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable bin\AccountManagement.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=D:\Projects\CPPProjs\accountmanagement\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Linking CXX executable bin\AccountManagement.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\AccountManagement.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
