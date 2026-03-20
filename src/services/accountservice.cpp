@@ -2,7 +2,7 @@
 #include <cstring>
 #include <ctime>
 #include "sqlite3.h"
-#include "model.h"
+#include "model.hpp"
 #include "accountservice.h"
 #include "accountdatabase.h"
 

@@ -5,7 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <stdexcept>
-#include "model.h"
+#include "model.hpp"
 #define DATA_ROOT "data/" //默认数据库地址（可能无法连接，若如此则直接在可执行文件同使用
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);

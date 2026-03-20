@@ -75,6 +75,118 @@ accountmanagement/
 └── compile.bat                     # 编译脚本
 ```
 
+### UML 类图
+
+#### 数据结构定义
+
+```mermaid
+classDiagram
+    class Account {
+        +char aName[19] 卡号
+        +char aPwd[9] 密码
+        +char nStatus[2] 卡状态
+        +time_t tStart 开卡时间
+        +time_t tEnd 截止时间
+        +float fTotalUse 累计金额
+        +time_t tLast 最后使用时间
+        +int nUseCount 使用次数
+        +float fBalance 余额
+        +int nDel 删除标记
+    }
+
+    class Billing {
+        +char aCardName[19] 卡号
+        +time_t tStart 上机时间
+        +time_t tEnd 下机时间
+        +float fAmount 消费金额
+        +int nStatus 消费状态
+        +int nDel 删除标记
+    }
+
+    class LogonInfo {
+        +char aCardName[19] 上机卡号
+        +time_t tLogon 上机时间
+        +float fBalance 上机余额
+    }
+
+    class SettleInfo {
+        +char aCardName[19] 卡号
+        +time_t tStart 上机时间
+        +time_t tEnd 下机时间
+        +float fAmount 消费金额
+        +float fBalance 余额
+    }
+```
+
+#### 数据库封装类
+
+```mermaid
+classDiagram
+    class sqlitedb {
+        -sqlite3* db 数据库连接
+        -string lastError 错误信息
+        +sqlitedb(dbPath) 构造函数
+        +~sqlitedb() 析构函数
+        +getLastError() 获取错误信息
+        +exec(sql, params) 执行SQL
+        +query(sql, params) 查询数据
+        +tablecreate(tableName, columnDefs) 建表
+        +insert(tableName, columns, values) 插入数据
+        +update(tableName, setClause, whereClause, params) 更新数据
+        +remove(tableName, whereClause, params) 删除数据
+        -bindParams(stmt, params) 绑定参数
+    }
+
+    sqlitedb ..> Account : queryToAccount()
+```
+
+#### 模块依赖关系
+
+```mermaid
+flowchart TB
+    subgraph 数据层
+        DB[(SQLite3)]
+        sqlitedb[sqlitedb 类]
+    end
+
+    subgraph 数据模型
+        Account[Account]
+        Billing[Billing]
+        LogonInfo[LogonInfo]
+        SettleInfo[SettleInfo]
+    end
+
+    subgraph 服务层
+        accountdb[accountdatabase]
+        accountsvc[accountservice]
+        loginout[loginout]
+        finance[financeservice]
+        billing[billingstandard]
+        logsearch[logsearch]
+    end
+
+    subgraph 调度层
+        service[service]
+        menu[menu]
+    end
+
+    subgraph 入口
+        Main[Main]
+    end
+
+    Main --> menu
+    menu --> service
+    service --> accountsvc
+    service --> loginout
+    service --> billing
+    service --> finance
+    service --> logsearch
+    accountsvc --> accountdb
+    accountdb --> sqlitedb
+    sqlitedb --> DB
+    sqlitedb --> Account
+```
+
 #### 模块说明
 
 | 层级 | 模块 | 接口函数 | 功能 |

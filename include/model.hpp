@@ -1,7 +1,8 @@
+#ifndef MODEL_HPP
+#define MODEL_HPP
+
 #include <ctime>
 #include <iostream>
-#ifndef MODEL_H
-#define MODEL_H
 
 typedef struct Account{
     char aName[19]; //卡号
@@ -25,18 +26,13 @@ typedef struct Billing{
     int nDel; // 删除表示 0,1
 }Billing; // 计费信息
 
-typedef struct LononInfo{
+typedef struct LogInfo{
     char aCardName[19]; // 上机卡号
-    time_t tLogon; // 上机时间
-    float fBalance; // 上机余额
-}LogonInfo; // 上机信息
-
-typedef struct SettleInfo{
-    char aCardName[19]; //卡号
     time_t tStart; // 上机时间
     time_t tEnd; // 下机时间
     float fAmount; // 消费金额
     float fBalance; // 余额
-}SettleInfo; // 下机信息
+}LogInfo; // 上下机信息
+
 
 #endif

@@ -3,9 +3,11 @@
 #include <cstring>
 #include "sqlite3.h"
 #include "database.h"
-#include "model.h"
+#include "model.hpp"
 
 using namespace std;
+
+// 用于数据库操作
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName){
    for(int i=0; i<argc; i++){
@@ -13,7 +15,7 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
    }
    printf("\n");
    return 0;
-} // 回调
+} // 回调函数
 
 
 sqlitedb::sqlitedb(const char* dbPath){
