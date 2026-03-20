@@ -11,7 +11,7 @@
 
 using namespace std;
 
-sqlitedb accountdb("account.db");
+sqlitedb accountdb(DATA_ROOT"account.db");
 
 void init(){
     const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aName TEXT UNIQUE NOT NULL, aPwd TEXT NOT NULL, nStatus INTEGER, tStart INTEGER, tEnd INTEGER, fTotalUse REAL, tLast INTEGER, nUseCount INTEGER, fBalance REAL, nDel INTEGER";

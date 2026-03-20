@@ -1,6 +1,15 @@
 #include <iostream>
 #include <ctime>
 #include <cstring>
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#define access _access
+#define mkdir _mkdir
+#else
+#include <unistd.h>
+#endif
 #include "sqlite3.h"
 #include "database.h"
 #include "model.hpp"
@@ -17,9 +26,41 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
    return 0;
 } // 回调函数
 
+static bool directoryExists(const char* path){
+#ifdef _WIN32
+    struct _stat info;
+    if (_stat(path, &info) != 0)
+        return false;
+    return (info.st_mode & _S_IFDIR) != 0;
+#else
+    struct stat info;
+    if (stat(path, &info) != 0)
+        return false;
+    return (info.st_mode & S_IFDIR) != 0;
+#endif
+}
+
+static bool createDirectory(const char* path){
+#ifdef _WIN32
+    return _mkdir(path) == 0;
+#else
+    return mkdir(path, 0755) == 0;
+#endif
+}
 
 sqlitedb::sqlitedb(const char* dbPath){
     string fullPath = string(DATA_ROOT) + dbPath;
+    
+    size_t pos = fullPath.find_last_of("/\\");
+    if (pos != string::npos) {
+        string dirPath = fullPath.substr(0, pos);
+        if (!directoryExists(dirPath.c_str())) {
+            if (!createDirectory(dirPath.c_str())) {
+                throw std::runtime_error("无法创建目录: " + dirPath);
+            }
+        }
+    }
+    
     int rc = sqlite3_open(fullPath.c_str(),&db);
     if(rc){
         string err = sqlite3_errmsg(db);

@@ -1,15 +1,17 @@
 #ifndef BILLINGDATABASE_H
 #define BILLINGDATABASE_H
+#include <iostream>
+#include <string>
 #include "model.hpp"
 
-void newstnd(void);
+bool newstnd();
 
-void searchstnd(void);
+bool searchstnd();
 
-void changestnd(void);
+bool changestnd();
 
-void deletestnd(void);
+bool deletestnd();
 
-Billing queryToBilling(const std::vector<std::vector<std::string>>& result, int index = 0); // 询问转记录结构体
+Billing queryToBilling(const std::vector<std::vector<std::string>>& result, int index); // 询问转记录结构体
 
 #endif

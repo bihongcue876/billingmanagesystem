@@ -3,6 +3,12 @@
 
 #include <ctime>
 #include <iostream>
+#include <string>
+
+enum class UnitType {
+    MINUTE,
+    HOUR
+}; // 计费规则枚举类
 
 typedef struct Account{
     char aName[19]; //卡号
@@ -18,12 +24,10 @@ typedef struct Account{
 }Account; //账户类
 
 typedef struct Billing{
-    char aCardName[19];
-    time_t tStart; // 上机时间
-    time_t tEnd; // 下机时间
-    float fAmount; // 消费金额
-    int nStatus; // 消费状态 0,1
-    int nDel; // 删除表示 0,1
+    std::string sPackageId; // 套餐编号
+    UnitType nUnitType; // 计费单位：MINUTE-分钟，HOUR-小时
+    float fUnitPrice; // 单价
+    int nDel; // 是否失效：0-有效，1-失效
 }Billing; // 计费信息
 
 typedef struct LogInfo{
@@ -32,6 +36,7 @@ typedef struct LogInfo{
     time_t tEnd; // 下机时间
     float fAmount; // 消费金额
     float fBalance; // 余额
+    int nPackageId; // 套餐ID，0表示无套餐
 }LogInfo; // 上下机信息
 
 

@@ -20,6 +20,19 @@ sqlitedb logdb(DATA_ROOT"loginout.db");
 
 static void initLogTable();
 
+static string getLogTableName();
+
+static float calculateFee(time_t tStart, time_t tEnd, float fUnitPrice, UnitType nUnitType){
+    time_t duration = tEnd - tStart;
+    float fAmount;
+    if(nUnitType == UnitType::MINUTE){
+        fAmount = duration / 60.0f * fUnitPrice;
+    } else {
+        fAmount = duration / 3600.0f * fUnitPrice;
+    }
+    return fAmount;
+}
+
 static string getLogTableName(){
     time_t now = time(nullptr);
     struct tm* timeinfo = localtime(&now);
@@ -103,10 +116,11 @@ int login(const char* cardname){
     string tableName = getLogTableName();
     string tStartStr = to_string(now);
     string fBalanceStr = to_string(acc.fBalance);
+    string packageIdStr = "0";
     
     // 插入登录日志记录
-    vector<const char*> logColumns = {"aCardName", "tStart", "tEnd", "fAmount", "fBalance"};
-    vector<const char*> logValues = {cardname, tStartStr.c_str(), "-1", "-1", fBalanceStr.c_str()};
+    vector<const char*> logColumns = {"aCardName", "tStart", "tEnd", "fAmount", "fBalance", "nPackageId"};
+    vector<const char*> logValues = {cardname, tStartStr.c_str(), "-1", "-1", fBalanceStr.c_str(), packageIdStr.c_str()};
     if(!logdb.insert(tableName.c_str(), logColumns, logValues)){
         return 4;
     }
@@ -153,7 +167,7 @@ int logout(const char* cardname){
     // 查询上机日志记录
     string tableName = getLogTableName();
     vector<const char*> logParams = {cardname};
-    string logSql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance FROM " + tableName + " WHERE aCardName=? AND tEnd=-1";
+    string logSql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance, nPackageId FROM " + tableName + " WHERE aCardName=? AND tEnd=-1";
     vector<vector<string>> logResult = logdb.query(logSql.c_str(), logParams);
     
     // 未找到上机记录
@@ -161,11 +175,10 @@ int logout(const char* cardname){
         return 3;
     }
     
-    // 计算消费金额（每分钟1元）
+    // 计算消费金额
     LogInfo log = queryToLogInfo(logResult, 0);
     time_t now = time(nullptr);
-    time_t duration = now - log.tStart;
-    float fAmount = duration / 60.0f;
+    float fAmount = calculateFee(log.tStart, now, 1.0f, UnitType::MINUTE);
     float fNewBalance = acc.fBalance - fAmount;
     
     // 更新上机日志记录
@@ -204,7 +217,7 @@ LogInfo queryToLogInfo(const vector<vector<string>>& result, int index){
         return log;
     }
     const vector<string>& row = result[index];
-    if(row.size() < 5){
+    if(row.size() < 6){
         memset(&log, 0, sizeof(LogInfo));
         return log;
     }
@@ -214,6 +227,7 @@ LogInfo queryToLogInfo(const vector<vector<string>>& result, int index){
     log.tEnd = stol(row[2]);
     log.fAmount = stof(row[3]);
     log.fBalance = stof(row[4]);
+    log.nPackageId = row.size() > 5 ? stoi(row[5]) : 0;
     return log;
 }
 
@@ -226,6 +240,6 @@ static void initLogTable(){
     char tableName[20];
     sprintf(tableName, "loginout%d", year);
     
-    const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aCardName TEXT NOT NULL, tStart INTEGER, tEnd INTEGER, fAmount REAL, fBalance REAL";
+    const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aCardName TEXT NOT NULL, tStart INTEGER, tEnd INTEGER, fAmount REAL, fBalance REAL, nPackageId INTEGER DEFAULT 0";
     logdb.tablecreate(tableName, columnDefs);
 }
