@@ -31,57 +31,64 @@ git push -u github master
 ### 功能设计
 
 ### 项目结构
-- 服务本体
-    - main.cpp
-    - menu.cpp/menu.h
-        - 对main接口 menu()
-    - global.h 全局变量和常量
-    - tool.cpp/tool.h 通用工具文件
-    - model.hpp 数据结构
-    - 服务
-        - service.cpp/service.h
-            - 对menu接口 service1() service2() service3() service4() service5()
-    - 数据库和数据服务
-        - 使用sqlitecpp（适合cpp）
-    1. 账户相关 --> 对应card_service.h
-        - accountservice.cpp/accountservice.h
-            - 对service接口 accountmenu()
-            - 功能：
-                - void accountsearch(void);// 查询账户
-                - void accountchange(void);// 账户信息变更
-                - void signupaccount(void);// 注册账户
-                - void deleteaccount(void);// 注销账户
-        - accountservice.cpp/accountservice.h
+```
+accountmanagement/
+├── src/                            # 源代码目录
+│   ├── Main.cpp                    # 程序入口
+│   ├── menu.cpp                    # 菜单模块实现
+│   ├── service.cpp                 # 服务调度实现
+│   ├── tool.cpp                    # 工具函数实现
+│   ├── database.cpp                # 数据库基础操作实现
+│   ├── services/                   # 业务服务模块
+│   │   ├── accountservice.cpp      # 账户服务实现
+│   │   ├── accountdatabase.cpp     # 账户数据库操作实现
+│   │   ├── billingstandard.cpp     # 计费标准服务实现
+│   │   ├── financeservice.cpp      # 财务服务实现
+│   │   ├── loginout.cpp            # 上下机服务实现
+│   │   └── logsearch.cpp           # 日志查询服务实现
+│   └── sqlite3/                    # SQLite3 嵌入式数据库
+│       ├── sqlite3.c
+│       ├── sqlite3.h
+│       ├── sqlite3ext.h
+│       └── shell.c
+├── include/                        # 头文件目录
+│   ├── menu.h                      # 菜单接口
+│   ├── service.h                   # 服务调度接口
+│   ├── tool.h                      # 工具函数接口
+│   ├── global.h                    # 全局变量和常量
+│   ├── model.h                     # 数据结构定义
+│   ├── database.h                  # 数据库基础操作接口
+│   ├── accountdatabase.h           # 账户数据库操作接口
+│   ├── accountservice.h            # 账户服务接口
+│   ├── billingstandard.h           # 计费标准服务接口
+│   ├── financeservice.h            # 财务服务接口
+│   ├── loginout.h                  # 上下机服务接口
+│   └── logsearch.h                 # 日志查询服务接口
+├── data/                           # 数据存储目录
+│   └── account.db                  # 账户数据库文件
+├── build/                          # 构建输出目录
+│   └── bin/
+│       └── AccountManagement.exe   # 可执行文件
+├── CMakeLists.txt                  # CMake 构建配置
+├── README.md
+├── run.bat                         # 运行脚本
+└── compile.bat                     # 编译脚本
+```
 
-    2. 上机下机
-        - loginout.cpp/loginout.h
-            - 对service接口 logmenu()
-            - 功能：
-                - void login(void);// 上机
-                - void logout(void);// 下机
-    3. 计费标准设定
-        - billingstandard.cpp/billingstandard.h
-            - 对service接口 billingmenu()
-            - 功能：
-                - void newstandard(void);// 新增计费标准
-                - void searchstandard(void);// 查询计费标准
-                - void changestandard(void);// 改动计费标准
-                - void deletestandard(void);// 删除计费标准
-    4. 财务系统
-        - financeservice.cpp/financeservice.h
-            - 对service接口 financemenu()
-            - 功能：
-                - void newstandard(void);// 新增计费标准
-                - void searchstandard(void);// 查询计费标准
-                - void changestandard(void);// 改动计费标准
-                - void deletestandard(void);// 删除计费标准
-    5. 查询统计
-        - logsearch.cpp/logsearch.h
-            - 对service接口 searchmenu()
-            - 功能：
-                - void totalsales(void);// 营业额与日志
-                - void uselogs(void);// 上下机日志
-                - void logprint(void);// 日志打印
+#### 模块说明
+
+| 层级 | 模块 | 接口函数 | 功能 |
+| --- | --- | --- | --- |
+| 入口层 | Main.cpp | `main()` | 程序入口 |
+| 菜单层 | menu.cpp/h | `menu()` | 主菜单 |
+| 调度层 | service.cpp/h | `service1~5()` | 服务路由：账户/使用/计费/财务/查询 |
+| 数据库层 | database.cpp/h | `sqlitedb` 类 | SQLite3 封装 |
+| 数据库层 | accountdatabase.cpp/h | `searchaccount()` `changeaccount()` `signup()` `deletecard()` | 账户数据操作 |
+| 服务层 | accountservice.cpp/h | `accountmenu()` → `accountsearch()` `accountchange()` `signupaccount()` `deleteaccount()` | 账户管理 |
+| 服务层 | loginout.cpp/h | `logmenu()` → `login()` `logout()` | 上下机 |
+| 服务层 | billingstandard.cpp/h | `billingmenu()` → `newstandard()` `searchstandard()` `changestandard()` `deletestandard()` | 计费标准 |
+| 服务层 | financeservice.cpp/h | `financemenu()` → `topup()` `refund()` `history()` `statistics()` | 财务服务 |
+| 服务层 | logsearch.cpp/h | `searchmenu()` → `totalsales()` `uselogs()` `logprint()` | 日志查询 |
 
 ### 信息表单（结构体数组设计卡务）
 1. 卡务信息
