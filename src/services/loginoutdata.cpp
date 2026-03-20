@@ -13,17 +13,24 @@
 }LogInfo; // 上下机信息*/
 
 sqlitedb logdb(DATA_ROOT"loginout.db");
+sqlitedb accountdb(DATA_ROOT"account.db");
 
 int login(const char* cardname){
-
-}// 上机操作，链接数据库
+    init();
+}// 上机操作，链接数据库（返回信息：0-有此账号并可以上机，1-账号余额不足，2-账号已经注销，3-账号不能重复上机，4-其他问题退出）
 
 int logout(const char* cardname){
-    
-}// 下机操作，链接数据库
+    init();
+}// 下机操作，链接数据库（返回信息：0-有此账号并允许下机，1-账号可以下机但欠费，2-账号已经注销，3-账号暂未上机，4-其他问题退出）
 
 void init(){
-    const char* columnDefs = "";
-    //列定义和写表格（如果没有则建表，如果有则不建表）
-    logdb.tablecreate("", columnDefs);
-} // 初始化检查
+    time_t now = time(nullptr);
+    struct tm* timeinfo = localtime(&now);
+    int year = timeinfo->tm_year + 1900;
+    
+    char tableName[20];
+    sprintf(tableName, "loginout%d", year);
+    
+    const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aCardName TEXT NOT NULL, tStart INTEGER, tEnd INTEGER, fAmount REAL, fBalance REAL";
+    logdb.tablecreate(tableName, columnDefs);
+}
