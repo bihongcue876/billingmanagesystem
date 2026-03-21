@@ -3,14 +3,19 @@
 #include <iostream>
 #include <string>
 #include "model.hpp"
+#include "database.h"
+
+extern sqlitedb billingdb;
+
+void initbilling();
 
 bool newstnd();
 
-bool searchstnd();
+bool searchstnd(const std::string& id = "");
 
-bool changestnd();
+bool changestnd(const std::string& id);
 
-bool deletestnd();
+bool deletestnd(const std::string& id);
 
 Billing queryToBilling(const std::vector<std::vector<std::string>>& result, int index); // 询问转记录结构体
 

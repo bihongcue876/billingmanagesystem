@@ -1,7 +1,7 @@
 # 计费管理系统
 
-- *(注意：这里面的主分支名为master而非main)，用于习惯新操作*
-- 可执行文件地址：./build/bin/AccountManager.exe
+- *(注意：这里面的主分支名为master而非main），用于习惯新操作*
+- 可执行文件地址：./build/bin/AccountManagement.exe
 
 - 头文件将参与编译，如多次调用则会编译慢速。
 - 条件编译机制 #ifndef #define #endif
@@ -40,12 +40,16 @@ accountmanagement/
 │   ├── tool.cpp                    # 工具函数实现
 │   ├── database.cpp                # 数据库基础操作实现
 │   ├── services/                   # 业务服务模块
-│   │   ├── accountservice.cpp      # 账户服务实现
 │   │   ├── accountdatabase.cpp     # 账户数据库操作实现
+│   │   ├── accountservice.cpp      # 账户服务实现
+│   │   ├── billingdatabase.cpp     # 计费标准数据库操作实现
 │   │   ├── billingstandard.cpp     # 计费标准服务实现
+│   │   ├── financedatabase.cpp     # 财务数据库操作实现
 │   │   ├── financeservice.cpp      # 财务服务实现
 │   │   ├── loginout.cpp            # 上下机服务实现
-│   │   └── logsearch.cpp           # 日志查询服务实现
+│   │   ├── loginoutdata.cpp        # 上下机数据操作实现
+│   │   ├── logsearch.cpp           # 日志查询服务实现
+│   │   └── search.cpp              # 搜索服务实现
 │   └── sqlite3/                    # SQLite3 嵌入式数据库
 │       ├── sqlite3.c
 │       ├── sqlite3.h
@@ -56,16 +60,21 @@ accountmanagement/
 │   ├── service.h                   # 服务调度接口
 │   ├── tool.h                      # 工具函数接口
 │   ├── global.h                    # 全局变量和常量
-│   ├── model.h                     # 数据结构定义
+│   ├── model.hpp                   # 数据结构定义
 │   ├── database.h                  # 数据库基础操作接口
 │   ├── accountdatabase.h           # 账户数据库操作接口
 │   ├── accountservice.h            # 账户服务接口
+│   ├── billingdatabase.h           # 计费标准数据库操作接口
 │   ├── billingstandard.h           # 计费标准服务接口
+│   ├── financedatabase.h           # 财务数据库操作接口
 │   ├── financeservice.h            # 财务服务接口
 │   ├── loginout.h                  # 上下机服务接口
-│   └── logsearch.h                 # 日志查询服务接口
+│   ├── loginoutdata.h              # 上下机数据操作接口
+│   ├── logsearch.h                 # 日志查询服务接口
+│   └── search.h                    # 搜索服务接口
 ├── data/                           # 数据存储目录
-│   └── account.db                  # 账户数据库文件
+│   └── data/
+│       └── loginout.db             # 上下机记录数据库文件
 ├── build/                          # 构建输出目录
 │   └── bin/
 │       └── AccountManagement.exe   # 可执行文件
@@ -81,6 +90,12 @@ accountmanagement/
 
 ```mermaid
 classDiagram
+    class UnitType {
+        <<enumeration>>
+        MINUTE
+        HOUR
+    }
+
     class Account {
         +char aName[19] 卡号
         +char aPwd[9] 密码
@@ -95,26 +110,19 @@ classDiagram
     }
 
     class Billing {
-        +char aCardName[19] 卡号
-        +time_t tStart 上机时间
-        +time_t tEnd 下机时间
-        +float fAmount 消费金额
-        +int nStatus 消费状态
-        +int nDel 删除标记
+        +string sPackageId 套餐编号
+        +UnitType nUnitType 计费单位
+        +float fUnitPrice 单价
+        +int nDel 是否失效
     }
 
-    class LogonInfo {
+    class LogInfo {
         +char aCardName[19] 上机卡号
-        +time_t tLogon 上机时间
-        +float fBalance 上机余额
-    }
-
-    class SettleInfo {
-        +char aCardName[19] 卡号
         +time_t tStart 上机时间
         +time_t tEnd 下机时间
         +float fAmount 消费金额
         +float fBalance 余额
+        +int nPackageId 套餐ID
     }
 ```
 
@@ -152,17 +160,24 @@ flowchart TB
     subgraph 数据模型
         Account[Account]
         Billing[Billing]
-        LogonInfo[LogonInfo]
-        SettleInfo[SettleInfo]
+        LogInfo[LogInfo]
+        UnitType[UnitType]
+    end
+
+    subgraph 数据访问层
+        accountdb[accountdatabase]
+        billingdb[billingdatabase]
+        financedb[financedatabase]
+        loginoutdata[loginoutdata]
     end
 
     subgraph 服务层
-        accountdb[accountdatabase]
         accountsvc[accountservice]
         loginout[loginout]
         finance[financeservice]
         billing[billingstandard]
         logsearch[logsearch]
+        search[search]
     end
 
     subgraph 调度层
@@ -183,8 +198,19 @@ flowchart TB
     service --> logsearch
     accountsvc --> accountdb
     accountdb --> sqlitedb
+    billing --> billingdb
+    billingdb --> sqlitedb
+    finance --> financedb
+    financedb --> sqlitedb
+    loginout --> loginoutdata
+    loginoutdata --> sqlitedb
+    logsearch --> search
+    search --> sqlitedb
     sqlitedb --> DB
     sqlitedb --> Account
+    sqlitedb --> Billing
+    sqlitedb --> LogInfo
+    Billing --> UnitType
 ```
 
 #### 模块说明
@@ -195,21 +221,26 @@ flowchart TB
 | 菜单层 | menu.cpp/h | `menu()` | 主菜单 |
 | 调度层 | service.cpp/h | `service1~5()` | 服务路由：账户/使用/计费/财务/查询 |
 | 数据库层 | database.cpp/h | `sqlitedb` 类 | SQLite3 封装 |
-| 数据库层 | accountdatabase.cpp/h | `searchaccount()` `changeaccount()` `signup()` `deletecard()` | 账户数据操作 |
-| 服务层 | accountservice.cpp/h | `accountmenu()` → `accountsearch()` `accountchange()` `signupaccount()` `deleteaccount()` | 账户管理 |
-| 服务层 | loginout.cpp/h | `logmenu()` → `login()` `logout()` | 上下机 |
-| 服务层 | billingstandard.cpp/h | `billingmenu()` → `newstandard()` `searchstandard()` `changestandard()` `deletestandard()` | 计费标准 |
-| 服务层 | financeservice.cpp/h | `financemenu()` → `topup()` `refund()` `history()` `statistics()` | 财务服务 |
-| 服务层 | logsearch.cpp/h | `searchmenu()` → `totalsales()` `uselogs()` `logprint()` | 日志查询 |
+| 数据访问层 | accountdatabase.cpp/h | `searchaccount()` `changeaccount()` `signup()` `deletecard()` `init()` | 账户数据操作 |
+| 数据访问层 | billingdatabase.cpp/h | `newstnd()` `searchstnd()` `changestnd()` `deletestnd()` `queryToBilling()` | 计费标准数据操作 |
+| 数据访问层 | financedatabase.cpp/h | - | 财务数据操作 |
+| 数据访问层 | loginoutdata.cpp/h | `login()` `logout()` `queryToLogInfo()` | 上下机数据操作 |
+| 服务层 | accountservice.cpp/h | `accountmenu()` | 账户管理菜单 |
+| 服务层 | loginout.cpp/h | `logmenu()` | 上下机菜单 |
+| 服务层 | billingstandard.cpp/h | `billingmenu()` | 计费标准菜单 |
+| 服务层 | financeservice.cpp/h | `financemenu()` | 财务服务菜单 |
+| 服务层 | logsearch.cpp/h | `searchmenu()` | 日志查询菜单 |
+| 服务层 | search.cpp/h | - | 搜索服务 |
 
-### 信息表单（结构体数组设计卡务）
-1. 卡务信息
+### 信息表单（数据结构定义）
+
+#### 1. 账户信息 (Account)
 
 |字段|类型|描述|
 | --- | --- | --- |
-|aName|string|卡号，不能为空，1~18字符|
-|aPwd|string|密码，不能为空|
-|nStatus|int|卡状态（0-未上机，1-上机中，2-已注销，3-失效）|
+|aName|char[19]|卡号|
+|aPwd|char[9]|密码|
+|nStatus|char[2]|卡状态（0-未上机，1-上机中，2-已注销，3-失效）|
 |tStart|time_t|开卡时间|
 |tEnd|time_t|截止时间|
 |fTotalUse|float|累计金额|
@@ -218,62 +249,25 @@ flowchart TB
 |fBalance|float|余额|
 |nDel|int|删除标记：0,1|
 
-2. 计费信息
+#### 2. 计费套餐信息 (Billing)
 
 |字段|类型|描述|
 | --- | --- | --- |
-|aCardName|string|卡号|
-|tStart|time_t|上机时间|
-|tEnd|time_t|下机时间|
-|fAmount|float|金额|
-|nStatus|int|卡状态（0-未结算，1-已结算）|
-|nDel|int|删除（0,1）|
+|sPackageId|string|套餐编号|
+|nUnitType|UnitType|计费单位：MINUTE-分钟，HOUR-小时|
+|fUnitPrice|float|单价|
+|nDel|int|是否失效：0-有效，1-失效|
 
-3. 计费标准信息
+#### 3. 上下机日志信息 (LogInfo)
 
 |字段|类型|描述|
 | --- | --- | --- |
-|starttime|time_t|开始时间|
-|endtime|time_t|结束时间|
-|unit|int|最小计费单元|
-|charge|float|计费单元收费|
-|ratetype|int|计费类别（0-一般，1-包夜，2-包日，3-月VIP，4-年VIP）|
-|del|int|删除标记（0,1）|
-
-4. 充值退费信息
-
-|字段|类型|可为空|描述|
-| --- | --- | --- | --- |
-|cardName|string|false|卡号|
-|operationtime|time_t|true|操作时间|
-|operation|int|true|操作类别（0-充值，1-退费）|
-|del|int|false|删除标志：0,1|
-
-5. 管理员
-
-|字段|类型|可为空|描述|
-| --- | --- | --- | --- |
-|name|string|false|用户名|
-|pwd|string|true|password|
-|privilege|int|false|删除标记：0,1|
-
-6. 上机
-
-|字段|类型|描述|
-| --- | --- | --- |
-|aCardName|string|上机卡号|
-|tLogon|time_t|上机时间|
-|fBalance|float|上机余额|
-
-7. 下机
-
-|字段|类型|描述|
-| --- | --- | --- |
-|aCardName|string|卡号|
+|aCardName|char[19]|上机卡号|
 |tStart|time_t|上机时间|
 |tEnd|time_t|下机时间|
 |fAmount|float|消费金额|
 |fBalance|float|余额|
+|nPackageId|int|套餐ID，0表示无套餐|
 
 ## 编译与组织方式改动 2026年3月13日
 - 构建方式：CMake
@@ -284,13 +278,10 @@ flowchart TB
 - 生成目录：build
 
 ## 数据库详情
-- 存储位置：data文件夹
+- 存储位置：data/data 文件夹
 - 对接方式：sqlite3
 - 数据库名：
-    - account.db - 账户
-    - standard.db - 计费标准
-    - bills.db - 账单
-    - logs.db - 记录（按照年月分表）
+    - loginout.db - 上下机记录数据库
 
 ## 其他预设
 - 第一个用户账号：

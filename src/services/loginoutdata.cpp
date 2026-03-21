@@ -1,11 +1,13 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <cmath>
 #include <conio.h>
 #include "loginoutdata.h"
 #include "database.h"
 #include "model.hpp"
 #include "accountdatabase.h"
+#include "billingdatabase.h"
 
 using namespace std;
 /*typedef struct LogInfo{
@@ -25,10 +27,21 @@ static string getLogTableName();
 static float calculateFee(time_t tStart, time_t tEnd, float fUnitPrice, UnitType nUnitType){
     time_t duration = tEnd - tStart;
     float fAmount;
+    
     if(nUnitType == UnitType::MINUTE){
-        fAmount = duration / 60.0f * fUnitPrice;
+        float minutes = duration / 60.0f;
+        if(minutes < 15){
+            minutes = floor(minutes);
+        } else if(minutes < 60){
+            minutes = ceil(minutes);
+        } else {
+            minutes = floor(minutes);
+        }
+        fAmount = minutes * fUnitPrice;
     } else {
-        fAmount = duration / 3600.0f * fUnitPrice;
+        float hours = duration / 3600.0f;
+        hours = ceil(hours);
+        fAmount = hours * fUnitPrice;
     }
     return fAmount;
 }
@@ -111,16 +124,59 @@ int login(const char* cardname){
         return 1;
     }
     
+    // 显示可用套餐并让管理员选择
+    initbilling();
+    vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice FROM billings WHERE nDel=0");
+    string packageId;
+    
+    if(billingResult.empty()){
+        cout << "无可用套餐，使用默认套餐" << endl;
+        packageId = "0";
+    } else {
+        cout << "请选择计费套餐：" << endl;
+        cout << "编号\t计费单位\t单价" << endl;
+        for(size_t i = 0; i < billingResult.size(); i++){
+            Billing billing = queryToBilling(billingResult, i);
+            string unitTypeStr = (billing.nUnitType == UnitType::MINUTE) ? "分钟" : "小时";
+            cout << billing.sPackageId << "\t" << unitTypeStr << "\t" << billing.fUnitPrice << "元" << endl;
+        }
+        
+        while(true){
+            cout << "输入套餐编号（直接回车使用默认套餐）：";
+            string inputId;
+            getline(cin, inputId);
+            
+            if(inputId.empty()){
+                packageId = "0";
+                break;
+            }
+            
+            bool found = false;
+            for(const auto& row : billingResult){
+                if(row[0] == inputId){
+                    found = true;
+                    packageId = inputId;
+                    break;
+                }
+            }
+            
+            if(found){
+                break;
+            } else {
+                cout << "套餐编号无效，请重新输入！" << endl;
+            }
+        }
+    }
+    
     // 记录上机日志
     time_t now = time(nullptr);
     string tableName = getLogTableName();
     string tStartStr = to_string(now);
     string fBalanceStr = to_string(acc.fBalance);
-    string packageIdStr = "0";
     
     // 插入登录日志记录
     vector<const char*> logColumns = {"aCardName", "tStart", "tEnd", "fAmount", "fBalance", "nPackageId"};
-    vector<const char*> logValues = {cardname, tStartStr.c_str(), "-1", "-1", fBalanceStr.c_str(), packageIdStr.c_str()};
+    vector<const char*> logValues = {cardname, tStartStr.c_str(), "-1", "-1", fBalanceStr.c_str(), packageId.c_str()};
     if(!logdb.insert(tableName.c_str(), logColumns, logValues)){
         return 4;
     }
@@ -178,7 +234,23 @@ int logout(const char* cardname){
     // 计算消费金额
     LogInfo log = queryToLogInfo(logResult, 0);
     time_t now = time(nullptr);
-    float fAmount = calculateFee(log.tStart, now, 1.0f, UnitType::MINUTE);
+    
+    // 获取套餐计费标准
+    float fUnitPrice = 0.1f;
+    UnitType nUnitType = UnitType::MINUTE;
+    if(log.nPackageId != 0){
+        initbilling();
+        string packageIdStr = to_string(log.nPackageId);
+        vector<const char*> billingParams = {packageIdStr.c_str()};
+        vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice FROM billings WHERE sPackageId=? AND nDel=0", billingParams);
+        if(!billingResult.empty()){
+            Billing billing = queryToBilling(billingResult, 0);
+            fUnitPrice = billing.fUnitPrice;
+            nUnitType = billing.nUnitType;
+        }
+    }
+    
+    float fAmount = calculateFee(log.tStart, now, fUnitPrice, nUnitType);
     float fNewBalance = acc.fBalance - fAmount;
     
     // 更新上机日志记录
