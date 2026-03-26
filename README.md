@@ -222,7 +222,7 @@ flowchart TB
 | 调度层 | service.cpp/h | `service1~5()` | 服务路由：账户/使用/计费/财务/查询 |
 | 数据库层 | database.cpp/h | `sqlitedb` 类 | SQLite3 封装 |
 | 数据访问层 | accountdatabase.cpp/h | `searchaccount()` `changeaccount()` `signup()` `deletecard()` `init()` | 账户数据操作 |
-| 数据访问层 | billingdatabase.cpp/h | `newstnd()` `searchstnd()` `changestnd()` `deletestnd()` `queryToBilling()` | 计费标准数据操作 |
+| 数据访问层 | billingdatabase.cpp/h | `newstnd()` `searchstnd()` `changestnd()` `deletestnd()` `initbilling()` `queryToBilling()` | 计费标准数据操作 |
 | 数据访问层 | financedatabase.cpp/h | - | 财务数据操作 |
 | 数据访问层 | loginoutdata.cpp/h | `login()` `logout()` `queryToLogInfo()` | 上下机数据操作 |
 | 服务层 | accountservice.cpp/h | `accountmenu()` | 账户管理菜单 |
@@ -236,38 +236,38 @@ flowchart TB
 
 #### 1. 账户信息 (Account)
 
-|字段|类型|描述|
+| 字段 | 类型 | 描述 |
 | --- | --- | --- |
-|aName|char[19]|卡号|
-|aPwd|char[9]|密码|
-|nStatus|char[2]|卡状态（0-未上机，1-上机中，2-已注销，3-失效）|
-|tStart|time_t|开卡时间|
-|tEnd|time_t|截止时间|
-|fTotalUse|float|累计金额|
-|tLast|time_t|最后使用时间|
-|nUseCount|int|使用次数|
-|fBalance|float|余额|
-|nDel|int|删除标记：0,1|
+| aName | char[19] | 卡号 |
+| aPwd | char[9] | 密码 |
+| nStatus | char[2] | 卡状态（0-未上机，1-上机中，2-已注销，3-失效） |
+| tStart | time_t | 开卡时间 |
+| tEnd | time_t | 截止时间 |
+| fTotalUse | float | 累计金额 |
+| tLast | time_t | 最后使用时间 |
+| nUseCount | int | 使用次数 |
+| fBalance | float | 余额 |
+| nDel | int | 删除标记：0,1 |
 
 #### 2. 计费套餐信息 (Billing)
 
-|字段|类型|描述|
+| 字段 | 类型 | 描述 |
 | --- | --- | --- |
-|sPackageId|string|套餐编号|
-|nUnitType|UnitType|计费单位：MINUTE-分钟，HOUR-小时|
-|fUnitPrice|float|单价|
-|nDel|int|是否失效：0-有效，1-失效|
+| sPackageId | string | 套餐编号 |
+| nUnitType | UnitType | 计费单位：MINUTE-分钟，HOUR-小时 |
+| fUnitPrice | float | 单价 |
+| nDel | int | 是否失效：0-有效，1-失效 |
 
 #### 3. 上下机日志信息 (LogInfo)
 
-|字段|类型|描述|
+| 字段 | 类型 | 描述 |
 | --- | --- | --- |
-|aCardName|char[19]|上机卡号|
-|tStart|time_t|上机时间|
-|tEnd|time_t|下机时间|
-|fAmount|float|消费金额|
-|fBalance|float|余额|
-|nPackageId|int|套餐ID，0表示无套餐|
+| aCardName | char[19] | 上机卡号 |
+| tStart | time_t | 上机时间 |
+| tEnd | time_t | 下机时间 |
+| fAmount | float | 消费金额 |
+| fBalance | float | 余额 |
+| nPackageId | int | 套餐ID，0表示无套餐 |
 
 ## 编译与组织方式改动 2026年3月13日
 - 构建方式：CMake
@@ -281,7 +281,32 @@ flowchart TB
 - 存储位置：data/data 文件夹
 - 对接方式：sqlite3
 - 数据库名：
+    - account.db - 账户数据库
+    - billing.db - 计费标准数据库
     - loginout.db - 上下机记录数据库
+
+## 计费规则
+
+### 套餐系统
+- 默认套餐：套餐"0"，计费单位为分钟，单价0.1元/分钟
+- 支持自定义套餐：可添加、查询、修改、删除计费套餐
+- 套餐选择：上机时可选择套餐，直接回车使用默认套餐
+
+### 计费取整规则
+
+#### 分钟计费
+- 上网时间 < 15分钟：向下取整
+- 15分钟 ≤ 上网时间 < 60分钟：向上取整
+- 上网时间 ≥ 60分钟：向下取整
+
+#### 小时计费
+- 全部向上取整
+
+### 示例
+- 上机14分钟：计费14分钟
+- 上机16分钟：计费16分钟
+- 上机65分钟：计费65分钟
+- 上机1.2小时：计费2小时
 
 ## 其他预设
 - 第一个用户账号：

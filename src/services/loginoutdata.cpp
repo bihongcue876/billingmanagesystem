@@ -8,6 +8,7 @@
 #include "model.hpp"
 #include "accountdatabase.h"
 #include "billingdatabase.h"
+#include "financedatabase.h"
 
 using namespace std;
 /*typedef struct LogInfo{
@@ -272,12 +273,15 @@ int logout(const char* cardname){
     if(!accountdb.update("accounts", "nStatus=?, tLast=?, fBalance=?", "aName=?", updateAccParams)){
         return 4;
     }
-    
+
+    // 记录财务交易（消费）
+    insertTransaction(cardname, 3, fAmount, acc.fBalance, fNewBalance, "上机消费");
+
     // 检查是否欠费
     if(fNewBalance < 0){
         return 1;
     }
-    
+
     return 0;
 }
 
