@@ -1,5 +1,7 @@
 # 整个 build 目录（CMake 生成目录）
 build/
+
+# 整个 data 目录（数据库文件）
 data/
 
 # CMake 生成的文件（根目录）
@@ -29,10 +31,8 @@ Makefile
 
 # 可执行文件（输出到项目根目录）
 *.exe
+!app.exe
 *.out
-
-# 数据库文件
-data/*.db
 
 # IDE 文件
 .vscode/
