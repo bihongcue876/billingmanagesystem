@@ -8,6 +8,7 @@
 #include "model.hpp"
 #include "database.h"
 #include "utils.hpp"
+#include "financedatabase.h"
 
 using namespace std;
 
@@ -115,10 +116,19 @@ void signup(void){
     cin.ignore(1024,'\n');
     
     vector<const char*> checkParams = {acc.aName};
-    vector<vector<string>> checkResult = accountdb.query("SELECT aName FROM accounts WHERE aName=?", checkParams);
+    vector<vector<string>> checkResult = accountdb.query("SELECT aName, nDel FROM accounts WHERE aName=?", checkParams);
+    
     if(!checkResult.empty()){
-        cout << "账号已存在，不可重复注册！" << endl;
-        return;
+        // 账号存在，检查是否已删除
+        // checkResult[0][1] 是 nDel 字段
+        if(checkResult[0][1] == "0"){
+            // 未删除，不可重复注册
+            cout << "账号已存在，不可重复注册！" << endl;
+            return;
+        } else {
+            // 已删除，可以重新启用，初始化账户信息
+            cout << "检测到已注销账号，将重新启用并初始化..." << endl;
+        }
     }
     
     cout << "请输入密码（最多8位）：";
@@ -185,10 +195,37 @@ void signup(void){
         balanceStr.c_str(),
         delStr.c_str()
     };
-    if(accountdb.insert("accounts", columns, values)){
-        cout << "注册成功！" << endl;
+    
+    if(!checkResult.empty()){
+        // 已存在的账号，执行更新操作
+        vector<const char*> updateParams = {
+            acc.aPwd,
+            acc.nStatus,
+            tStartStr.c_str(),
+            tEndStr.c_str(),
+            totalUseStr.c_str(),
+            tLastStr.c_str(),
+            useCountStr.c_str(),
+            balanceStr.c_str(),
+            delStr.c_str(),
+            acc.aName
+        };
+        if(accountdb.update("accounts", "aPwd=?, nStatus=?, tStart=?, tEnd=?, fTotalUse=?, tLast=?, nUseCount=?, fBalance=?, nDel=?", "aName=?", updateParams)){
+            cout << "账号已重新启用，信息已初始化！" << endl;
+            // 记录充值交易
+            insertTransaction(acc.aName, 1, acc.fBalance, 0.0f, acc.fBalance, "账户充值");
+        } else {
+            cout << "启用失败：" << accountdb.getLastError() << endl;
+        }
     } else {
-        cout << "注册失败：" << accountdb.getLastError() << endl;
+        // 新账号，执行插入操作
+        if(accountdb.insert("accounts", columns, values)){
+            cout << "注册成功！" << endl;
+            // 记录充值交易
+            insertTransaction(acc.aName, 1, acc.fBalance, 0.0f, acc.fBalance, "账户充值");
+        } else {
+            cout << "注册失败：" << accountdb.getLastError() << endl;
+        }
     }
 } // 注册
 

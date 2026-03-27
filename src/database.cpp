@@ -1,42 +1,14 @@
 #include <iostream>
 #include <ctime>
 #include <cstring>
-#include <sys/stat.h>
-#ifdef _WIN32
-#include <direct.h>
-#include <io.h>
-#define access _access
-#define mkdir _mkdir
-#else
-#include <unistd.h>
-#endif
 #include "sqlite3.h"
 #include "database.h"
 #include "model.hpp"
 
 using namespace std;
 
-/**
- * @file database.cpp
- * @brief SQLite 数据库封装类实现文件
- * 
- * 本文件实现了 sqlitedb 类的所有成员函数，提供完整的数据库操作功能，
- * 包括连接管理、SQL 执行、参数绑定、查询结果处理等。
- * 
- * @author 开发者
- * @date 2026-03-26
- */
-
 // ==================== 辅助函数 ====================
 
-/**
- * @brief SQLite 回调函数（实际未使用，保留用于兼容）
- * @param NotUsed 未使用的参数
- * @param argc 结果列数
- * @param argv 结果数据数组
- * @param azColName 列名数组
- * @return 固定返回 0
- */
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     for(int i = 0; i < argc; i++) {
         printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
@@ -45,91 +17,33 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
-/**
- * @brief 检查目录是否存在
- * @param path 目录路径
- * @return 存在返回 true，不存在返回 false
- */
-static bool directoryExists(const char* path) {
-#ifdef _WIN32
-    struct _stat info;
-    if (_stat(path, &info) != 0)
-        return false;
-    return (info.st_mode & _S_IFDIR) != 0;
-#else
-    struct stat info;
-    if (stat(path, &info) != 0)
-        return false;
-    return (info.st_mode & S_IFDIR) != 0;
-#endif
-}
-
-/**
- * @brief 创建目录
- * @param path 目录路径
- * @return 创建成功返回 true，失败返回 false
- */
-static bool createDirectory(const char* path) {
-#ifdef _WIN32
-    return _mkdir(path) == 0;
-#else
-    return mkdir(path, 0755) == 0;
-#endif
-}
-
 // ==================== sqlitedb 类实现 ====================
 
-/**
- * @brief 构造函数，初始化数据库连接
- * @details 自动创建数据库文件所在目录（如果不存在）
- * @param dbPath 数据库文件路径（相对于 DATA_ROOT）
- * @throws std::runtime_error 当无法创建目录或连接数据库时抛出
- */
+// sqlitedb 构造函数
 sqlitedb::sqlitedb(const char* dbPath) {
-    // 构建完整路径
-    string fullPath = string(DATA_ROOT) + dbPath;
-
-    // 提取目录部分并创建（如果不存在）
-    size_t pos = fullPath.find_last_of("/\\");
-    if (pos != string::npos) {
-        string dirPath = fullPath.substr(0, pos);
-        if (!directoryExists(dirPath.c_str())) {
-            if (!createDirectory(dirPath.c_str())) {
-                throw std::runtime_error("无法创建目录：" + dirPath);
-            }
-        }
-    }
+    // 先创建 data 目录（如果不存在）
+    system("if not exist data\\ mkdir data");
 
     // 打开数据库连接
-    int rc = sqlite3_open(fullPath.c_str(), &db);
+    int rc = sqlite3_open(dbPath, &db);
     if(rc) {
         string err = sqlite3_errmsg(db);
         sqlite3_close(db);
-        throw std::runtime_error("无法连接数据库：" + err);
+        throw runtime_error("无法连接数据库：" + err);
     }
 }
 
-/**
- * @brief 析构函数，关闭数据库连接
- */
+// sqlitedb 析构函数
 sqlitedb::~sqlitedb() {
     if(db) sqlite3_close(db);
 }
 
-/**
- * @brief 获取最后一次错误信息
- * @return 错误信息字符串的 C 风格指针
- */
+// 获取最后一次错误信息
 const char* sqlitedb::getLastError() const {
     return lastError.c_str();
 }
 
-/**
- * @brief 绑定参数到预编译语句
- * @details 将参数列表中的字符串依次绑定到 SQL 语句的占位符（?）上
- * @param stmt SQLite 预编译语句指针
- * @param params 参数列表
- */
+// 绑定参数到预编译语句
 void sqlitedb::bindParams(sqlite3_stmt* stmt, const std::vector<const char*>& params) {
     for (size_t i = 0; i < params.size(); ++i) {
         int idx = static_cast<int>(i + 1);  // SQLite 参数索引从 1 开始
@@ -138,13 +52,7 @@ void sqlitedb::bindParams(sqlite3_stmt* stmt, const std::vector<const char*>& pa
     }
 }
 
-/**
- * @brief 执行不返回数据的 SQL 语句
- * @details 支持 INSERT、UPDATE、DELETE、CREATE 等操作
- * @param sql SQL 语句字符串
- * @param params 参数列表，用于参数化查询
- * @return 执行成功返回 true，失败返回 false
- */
+// 执行不返回数据的 SQL 语句
 bool sqlitedb::exec(const char* sql, const std::vector<const char*>& params) {
     sqlite3_stmt* stmt = nullptr;
     const char* tail = nullptr;
@@ -172,18 +80,12 @@ bool sqlitedb::exec(const char* sql, const std::vector<const char*>& params) {
     return true;
 }
 
-/**
- * @brief 执行查询 SQL 语句并返回结果
- * @details 使用预编译语句和参数绑定，逐行获取查询结果
- * @param sql SQL 查询语句
- * @param params 参数列表，用于参数化查询
- * @return 二维字符串向量，每行是一个字符串向量
- */
+// 执行查询 SQL 语句并返回结果
 std::vector<std::vector<std::string>> sqlitedb::query(const char* sql, const std::vector<const char*>& params) {
     std::vector<std::vector<std::string>> result;  // 存储最终结果集的二维向量
     sqlite3_stmt* stmt = nullptr;                   // 预编译语句对象指针
     const char* tail = nullptr;                     // 未使用的 SQL 尾部（忽略）
-    
+
     // 将 SQL 文本编译为预编译语句对象
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
     if (rc != SQLITE_OK) {
@@ -222,26 +124,13 @@ std::vector<std::vector<std::string>> sqlitedb::query(const char* sql, const std
     return result;
 }
 
-/**
- * @brief 创建数据表
- * @details 使用 CREATE TABLE IF NOT EXISTS 语句，避免重复创建
- * @param tableName 表名
- * @param columnDefs 列定义字符串
- * @return 创建成功返回 true，失败返回 false
- */
+// 创建数据表
 bool sqlitedb::tablecreate(const char* tableName, const char* columnDefs) {
     std::string sql = std::string("CREATE TABLE IF NOT EXISTS ") + tableName + " (" + columnDefs + ");";
     return exec(sql.c_str());
 }
 
-/**
- * @brief 插入数据
- * @details 使用参数化查询防止 SQL 注入
- * @param tableName 表名
- * @param columns 列名列表
- * @param values 值列表，与列名一一对应
- * @return 插入成功返回 true，失败返回 false
- */
+// 插入数据
 bool sqlitedb::insert(const char* tableName, const std::vector<const char*>& columns, const std::vector<const char*>& values) {
     // 检查列数和值数是否匹配
     if (columns.size() != values.size()) {
@@ -289,15 +178,7 @@ bool sqlitedb::insert(const char* tableName, const std::vector<const char*>& col
     return true;
 }
 
-/**
- * @brief 更新数据
- * @details 构建 UPDATE 语句并执行
- * @param tableName 表名
- * @param setClause SET 子句
- * @param whereClause WHERE 子句
- * @param params 参数列表
- * @return 更新成功返回 true，失败返回 false
- */
+// 更新数据
 bool sqlitedb::update(const char* tableName, const char* setClause, const char* whereClause, const std::vector<const char*>& params) {
     std::string sql = "UPDATE ";
     sql += tableName;
@@ -314,14 +195,7 @@ bool sqlitedb::update(const char* tableName, const char* setClause, const char* 
     return exec(sql.c_str(), params);
 }
 
-/**
- * @brief 删除数据
- * @details 构建 DELETE 语句并执行
- * @param tableName 表名
- * @param whereClause WHERE 子句
- * @param params 参数列表
- * @return 删除成功返回 true，失败返回 false
- */
+// 删除数据
 bool sqlitedb::remove(const char* tableName, const char* whereClause, const std::vector<const char*>& params) {
     std::string sql = "DELETE FROM ";
     sql += tableName;
@@ -336,15 +210,7 @@ bool sqlitedb::remove(const char* tableName, const char* whereClause, const std:
     return exec(sql.c_str(), params);
 }
 
-// ==================== 辅助函数实现 ====================
-
-/**
- * @brief 将查询结果转换为 Account 对象
- * @details 从查询结果中提取字段并填充 Account 结构体
- * @param result 查询结果（二维字符串向量）
- * @param index 要转换的行索引，默认为 0
- * @return Account 对象，若结果无效则返回零初始化的对象
- */
+// 将查询结果转换为 Account 对象
 Account queryToAccount(const vector<vector<string>>& result, int index) {
     Account acc;
     

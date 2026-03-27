@@ -11,13 +11,6 @@
 #include "financedatabase.h"
 
 using namespace std;
-/*typedef struct LogInfo{
-    char aCardName[19]; // 上机卡号
-    time_t tStart; // 上机时间
-    time_t tEnd; // 下机时间
-    float fAmount; // 消费金额
-    float fBalance; // 余额
-}LogInfo; // 上下机信息*/
 
 sqlitedb logdb(DATA_ROOT"loginout.db");
 
@@ -28,7 +21,7 @@ static string getLogTableName();
 static float calculateFee(time_t tStart, time_t tEnd, float fUnitPrice, UnitType nUnitType){
     time_t duration = tEnd - tStart;
     float fAmount;
-    
+
     if(nUnitType == UnitType::MINUTE){
         float minutes = duration / 60.0f;
         if(minutes < 15){
@@ -56,33 +49,33 @@ static string getLogTableName(){
 }
 
 // 上机登录函数
-// 返回值: 0-成功, 1-余额不足, 2-卡号已注销或被禁用, 3-卡号已在使用中, 4-其他错误
+// 返回值：0-成功，1-余额不足，2-卡号已注销或被禁用，3-卡号已在使用中，4-其他错误
 int login(const char* cardname){
     init();
     initLogTable();
-    
+
     // 查询账户信息
     vector<const char*> params = {cardname};
     vector<vector<string>> result = accountdb.query(
         "SELECT aName, aPwd, nStatus, tStart, tEnd, fTotalUse, tLast, nUseCount, fBalance, nDel FROM accounts WHERE aName=?", params);
-    
+
     // 账户不存在
     if(result.empty()){
         return 4;
     }
-    
+
     // 解析账户信息
     Account acc = queryToAccount(result, 0);
-    
+
     // 检查账户是否已注销或被禁用
     if(acc.nDel == 1 || strcmp(acc.nStatus, "2") == 0){
         return 2;
     }
-    
+
     // 密码验证：允许输入五次
     bool pwdCorrect = false;
     for(int attempt = 1; attempt <= 5; attempt++){
-        cout << "请输入密码（第" << attempt << "次尝试）：";
+        cout << "请输入密码：";
         char inputPwd[9];
         int pwdIndex = 0;
         char ch;
@@ -100,36 +93,38 @@ int login(const char* cardname){
         }
         inputPwd[pwdIndex] = '\0';
         cout << endl;
-        
+
         if(strcmp(inputPwd, acc.aPwd) == 0){
             pwdCorrect = true;
             break;
         } else {
-            cout << "密码错误！" << endl;
+            if(attempt < 5){
+                cout << "密码错误，还剩 " << (5 - attempt) << " 次机会" << endl;
+            }
         }
     }
-    
+
     // 五次密码全错，退出函数
     if(!pwdCorrect){
         cout << "密码错误次数过多，上机失败" << endl;
         return 4;
     }
-    
+
     // 检查账户是否已在上机状态
     if(strcmp(acc.nStatus, "1") == 0){
         return 3;
     }
-    
+
     // 检查余额是否充足
     if(acc.fBalance <= 0){
         return 1;
     }
-    
+
     // 显示可用套餐并让管理员选择
     initbilling();
     vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice FROM billings WHERE nDel=0");
     string packageId;
-    
+
     if(billingResult.empty()){
         cout << "无可用套餐，使用默认套餐" << endl;
         packageId = "0";
@@ -141,17 +136,17 @@ int login(const char* cardname){
             string unitTypeStr = (billing.nUnitType == UnitType::MINUTE) ? "分钟" : "小时";
             cout << billing.sPackageId << "\t" << unitTypeStr << "\t" << billing.fUnitPrice << "元" << endl;
         }
-        
+
         while(true){
             cout << "输入套餐编号（直接回车使用默认套餐）：";
             string inputId;
             getline(cin, inputId);
-            
+
             if(inputId.empty()){
                 packageId = "0";
                 break;
             }
-            
+
             bool found = false;
             for(const auto& row : billingResult){
                 if(row[0] == inputId){
@@ -160,7 +155,7 @@ int login(const char* cardname){
                     break;
                 }
             }
-            
+
             if(found){
                 break;
             } else {
@@ -168,74 +163,74 @@ int login(const char* cardname){
             }
         }
     }
-    
+
     // 记录上机日志
     time_t now = time(nullptr);
     string tableName = getLogTableName();
     string tStartStr = to_string(now);
     string fBalanceStr = to_string(acc.fBalance);
-    
+
     // 插入登录日志记录
     vector<const char*> logColumns = {"aCardName", "tStart", "tEnd", "fAmount", "fBalance", "nPackageId"};
     vector<const char*> logValues = {cardname, tStartStr.c_str(), "-1", "-1", fBalanceStr.c_str(), packageId.c_str()};
     if(!logdb.insert(tableName.c_str(), logColumns, logValues)){
         return 4;
     }
-    
+
     // 更新账户状态为上机中
     string useCountStr = to_string(acc.nUseCount + 1);
     vector<const char*> updateParams = {"1", tStartStr.c_str(), useCountStr.c_str(), cardname};
     if(!accountdb.update("accounts", "nStatus=?, tLast=?, nUseCount=?", "aName=?", updateParams)){
         return 4;
     }
-    
+
     return 0;
 }
 
 // 下机登出函数
-// 返回值: 0-成功下机, 1-下机成功但欠费, 2-卡号已注销, 3-卡号未上机, 4-其他错误
+// 返回值：0-成功下机，1-下机成功但欠费，2-卡号已注销，3-卡号未上机，4-其他错误
 int logout(const char* cardname){
     init();
     initLogTable();
-    
+
     // 查询账户信息
     vector<const char*> params = {cardname};
     vector<vector<string>> result = accountdb.query(
         "SELECT aName, aPwd, nStatus, tStart, tEnd, fTotalUse, tLast, nUseCount, fBalance, nDel FROM accounts WHERE aName=?", params);
-    
+
     // 账户不存在
     if(result.empty()){
         return 4;
     }
-    
+
     // 解析账户信息
     Account acc = queryToAccount(result, 0);
-    
+
     // 检查账户是否已注销或被禁用
     if(acc.nDel == 1 || strcmp(acc.nStatus, "2") == 0){
         return 2;
     }
-    
+
     // 检查账户是否处于未上机状态
     if(strcmp(acc.nStatus, "0") == 0){
         return 3;
     }
-    
+
     // 查询上机日志记录
     string tableName = getLogTableName();
     vector<const char*> logParams = {cardname};
     string logSql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance, nPackageId FROM " + tableName + " WHERE aCardName=? AND tEnd=-1";
     vector<vector<string>> logResult = logdb.query(logSql.c_str(), logParams);
-    
+
     // 未找到上机记录
     if(logResult.empty()){
         return 3;
     }
-    
+
     // 计算消费金额
     LogInfo log = queryToLogInfo(logResult, 0);
     time_t now = time(nullptr);
-    
+
     // 获取套餐计费标准
     float fUnitPrice = 0.1f;
     UnitType nUnitType = UnitType::MINUTE;
@@ -250,21 +245,21 @@ int logout(const char* cardname){
             nUnitType = billing.nUnitType;
         }
     }
-    
+
     float fAmount = calculateFee(log.tStart, now, fUnitPrice, nUnitType);
     float fNewBalance = acc.fBalance - fAmount;
-    
+
     // 更新上机日志记录
     string tEndStr = to_string(now);
     string fAmountStr = to_string(fAmount);
     string fNewBalanceStr = to_string(fNewBalance);
     string idStr = logResult[0][0];
-    
+
     vector<const char*> updateLogParams = {tEndStr.c_str(), fAmountStr.c_str(), fNewBalanceStr.c_str(), idStr.c_str()};
     if(!logdb.update(tableName.c_str(), "tEnd=?, fAmount=?, fBalance=?", "id=?", updateLogParams)){
         return 4;
     }
-    
+
     // 更新账户状态为未上机
     string statusStr = "0";
     string tLastStr = to_string(now);
@@ -285,7 +280,7 @@ int logout(const char* cardname){
     return 0;
 }
 
-// 将查询结果转换为LogInfo结构体
+// 将查询结果转换为 LogInfo 结构体
 LogInfo queryToLogInfo(const vector<vector<string>>& result, int index){
     LogInfo log;
     if(result.empty() || index >= (int)result.size()){
@@ -293,20 +288,21 @@ LogInfo queryToLogInfo(const vector<vector<string>>& result, int index){
         return log;
     }
     const vector<string>& row = result[index];
-    if(row.size() < 6){
+    if(row.size() < 7){
         memset(&log, 0, sizeof(LogInfo));
         return log;
     }
-    strncpy(log.aCardName, row[0].c_str(), 18);
+    // 查询结果包含 id，所以索引从 1 开始
+    strncpy(log.aCardName, row[1].c_str(), 18);
     log.aCardName[18] = '\0';
-    
+
     // 转换数值类型，捕获可能的异常
     try {
-        log.tStart = stol(row[1]);
-        log.tEnd = stol(row[2]);
-        log.fAmount = stof(row[3]);
-        log.fBalance = stof(row[4]);
-        log.nPackageId = row.size() > 5 ? stoi(row[5]) : 0;
+        log.tStart = stol(row[2]);
+        log.tEnd = stol(row[3]);
+        log.fAmount = stof(row[4]);
+        log.fBalance = stof(row[5]);
+        log.nPackageId = row.size() > 6 ? stoi(row[6]) : 0;
     } catch (const std::exception& e) {
         // 数据格式错误，返回零初始化的对象
         memset(&log, 0, sizeof(LogInfo));
@@ -320,10 +316,10 @@ static void initLogTable(){
     time_t now = time(nullptr);
     struct tm* timeinfo = localtime(&now);
     int year = timeinfo->tm_year + 1900;
-    
+
     char tableName[20];
     sprintf(tableName, "loginout%d", year);
-    
+
     const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aCardName TEXT NOT NULL, tStart INTEGER, tEnd INTEGER, fAmount REAL, fBalance REAL, nPackageId INTEGER DEFAULT 0";
     logdb.tablecreate(tableName, columnDefs);
 }

@@ -1,5 +1,6 @@
 # 整个 build 目录（CMake 生成目录）
 build/
+data/
 
 # CMake 生成的文件（根目录）
 CMakeCache.txt

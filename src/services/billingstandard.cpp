@@ -16,13 +16,13 @@ void billingmenu(){
     char ch;
     while (true) {
         cout << "\n--------计费标准设置目录--------" << endl;
-        cout << "1. 新增标准\n2. 查询标准\n3. 修改标准\n4. 删除标准\n0. 退出计费标准设置\n" << endl;
+        cout << "1. 新增标准\n2. 查询标准\n3. 修改标准\n4. 删除标准\n0. 返回主菜单\n" << endl;
         cout << "输入数字指令以继续：";
         cin >> ch;
         cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在退出计费标准设置\n" << endl;
+                cout << "正在返回主菜单\n" << endl;
                 return;
             case '1':
                 cout << "新增计费标准\n" << endl;

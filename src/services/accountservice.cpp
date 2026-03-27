@@ -17,13 +17,13 @@ void accountmenu(void){
     char ch;
     while (true) {
         cout << "\n--------账户服务目录--------" << endl;
-        cout << "1. 查询账户\n2. 账户信息变更\n3. 注册账户\n4. 删除账户\n0. 退出服务\n" << endl;
+        cout << "1. 查询账户\n2. 账户信息变更\n3. 注册账户\n4. 删除账户\n0. 返回主菜单\n" << endl;
         cout << "输入数字指令以继续：";
         cin >> ch;
         cin.ignore(1024, '\n'); // 忽略后面的东西
         switch (ch) {
             case '0':
-                cout << "正在退出账户服务\n" << endl;
+                cout << "正在返回主菜单\n" << endl;
                 return;
                 break;
             case '1':

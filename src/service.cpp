@@ -5,6 +5,7 @@
 #include "financeservice.h"
 #include "loginout.h"
 #include "logsearch.h"
+#include "adminservice.h"
 
 using namespace std;
 
@@ -50,10 +51,11 @@ void service4() {
     financemenu();  // 进入财务管理子菜单
 }
 
-/**
- * @brief 服务 5：查询统计服务调度
- * @details 调用查询统计子菜单
- */
 void service5() {
-    searchmenu();  // 进入查询统计子菜单
+    searchmenu();
+}
+
+// 服务 6：管理员管理服务调度
+void service6() {
+    adminmenu();
 }

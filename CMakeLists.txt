@@ -11,11 +11,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# 设置输出目录 - 可执行文件输出到项目根目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
 # 包含目录
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
@@ -34,6 +29,16 @@ file(GLOB_RECURSE C_SOURCES
 
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${CPP_SOURCES} ${C_SOURCES})
+
+# 设置输出目录 - 可执行文件输出到项目根目录，命名为 app.exe
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_NAME "app"
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+)
 
 get_target_property(OUT_DIR ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
 message(STATUS "Runtime output directory for ${PROJECT_NAME}: ${OUT_DIR}")

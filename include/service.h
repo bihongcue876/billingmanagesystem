@@ -41,4 +41,10 @@ void service4();
  */
 void service5();
 
+/**
+ * @brief 服务 6：管理员管理服务
+ * @details 处理管理员相关的操作，如修改密码、添加/删除管理员等
+ */
+void service6();
+
 #endif // SERVICE_H

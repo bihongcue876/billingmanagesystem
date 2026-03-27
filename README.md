@@ -1,314 +1,321 @@
 # 计费管理系统
 
-- *(注意：这里面的主分支名为master而非main），用于习惯新操作*
-- 可执行文件地址：./build/bin/AccountManagement.exe
+> 基于 C++ 和 SQLite3 的控制台计费管理系统
 
-- 头文件将参与编译，如多次调用则会编译慢速。
-- 条件编译机制 #ifndef #define #endif
+---
 
-- 上传平台：origin
+## 默认账号密码
+
+### 管理员账号（首次登录必需）
+| 账号 | 密码 |
+| --- | --- |
+| `admin` | `123456` |
+
+### 预设用户账号
+| 卡号 | 密码 |
+| --- | --- |
+| `10000000` | `11111111` |
+
+---
+
+## 快速开始
+
 ```bash
-git push -u gitee master
-git push -u github master
+# 直接运行
+app.exe
+
+# 或使用脚本
+compile.bat
 ```
-- 项目运行方式：run.bat , 控制台：`run`
 
-## 前序安排
-- 使用compile.bat快速编译，即注意在cmd终端里面编译和运行。
+---
 
-## 需求分析
-- 设计计费基于控制台交互的管理系统，包含三个主要需求
-    - 1. 基于卡号的用户管理制度
-    - 2. 用户有关数据管理
-    - 3. 上下机活动和结算
+## 菜单结构
 
-## CLI菜单设计
-- 封装函数。
-- 一个菜单不超过6项，通常为5项，编号不超过5
-> 心理学中的 “米勒定律”（Miller's Law），即人类的工作记忆容量大约为 7±2 个组块。这一原则常被引申到用户界面设计中，建议菜单或导航的选项数量控制在 5～9 项 以内，以避免用户因信息过载而产生认知负担。
+### 主菜单
+```
+--------主菜单--------
+1. 账户相关
+2. 上机下机
+3. 计费标准设定
+4. 财务系统
+5. 查询统计
+6. 管理员管理
+0. 退出系统
+```
 
-## 项目设计
-### 功能设计
+---
 
-### 项目结构
+## 功能模块
+
+| 模块 | 功能 |
+| --- | --- |
+| 管理员管理 | 修改密码、添加/删除管理员、管理员列表 |
+| 账户管理 | 开户、销户、查询、修改信息 |
+| 上下机管理 | 上机、下机、自动计费 |
+| 计费标准 | 新增、查询、修改、删除套餐 |
+| 财务系统 | 充值、退费、消费记录、营业额统计 |
+| 查询统计 | 营业额日志、上下机日志、日志打印 |
+
+---
+
+## 数据结构（UML 类图）
+
+```
++------------------+       +------------------+
+|    UnitType      |       |     Account      |
++------------------+       +------------------+
+| - MINUTE (分钟)  |       | - aName[19] 卡号  |
+| - HOUR (小时)    |       | - aPwd[9] 密码    |
++------------------+       | - nStatus[2] 状态 |
+                           | - tStart 开卡时间  |
+                           | - tEnd 截止时间    |
+                           | - fTotalUse 累计  |
+                           | - tLast 最后使用  |
+                           | - nUseCount 次数  |
+                           | - fBalance 余额   |
+                           | - nDel 删除标记   |
+                           +------------------+
+
++------------------+       +------------------+
+|     Billing      |       |     LogInfo      |
++------------------+       +------------------+
+| - sPackageId 编号 |       | - aCardName 卡号  |
+| - nUnitType 单位  |       | - tStart 上机时间 |
+| - fUnitPrice 单价 |       | - tEnd 下机时间   |
+| - nDel 失效标记   |       | - fAmount 消费额  |
++------------------+       | - fBalance 余额   |
+                           | - nPackageId 套餐 |
+                           +------------------+
+
++------------------+       +------------------+
+|     Finance      |       |    AdminInfo     |
++------------------+       +------------------+
+| - id 交易 ID       |       | - id 管理员 ID     |
+| - cardId 卡号     |       | - username 账号  |
+| - type 类型       |       | - password 密码  |
+| - amount 金额     |       | - createTime 时间|
+| - remark 备注     |       +------------------+
+| - time 时间       |
++------------------+
+```
+
+---
+
+## 模块架构（ASCII UML）
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Main.cpp                                │
+│                         main()                                  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                          menu()                                 │
+│                      主菜单循环                                 │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│   service1()  │   │   service2()  │   │   service3()  │
+│   账户相关     │   │   上机下机     │   │   计费标准     │
+└───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+        │                   │                   │
+        ▼                   ▼                   ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│ accountmenu() │   │   logmenu()   │   │ billingmenu() │
+└───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+        │                   │                   │
+        ▼                   ▼                   ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│searchaccount()│   │   login()     │   │  newstnd()    │
+│changeaccount()│   │   logout()    │   │ searchstnd()  │
+│   signup()    │   │               │   │ changestnd()  │
+│ deletecard()  │   │               │   │ deletestnd()  │
+└───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+        │                   │                   │
+        └───────────────────┼───────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        sqlitedb 类                               │
+│  +-------------------+  +-----------------------------------+   │
+│  | - db (sqlite3*)   |  | + exec()   执行 SQL               |   │
+│  | - lastError       |  | + query()  查询数据               |   │
+│  +-------------------+  | + tablecreate() 建表              |   │
+│                         | + insert()   插入                 |   │
+│                         | + update()   更新                 |   │
+│                         | + remove()   删除                 |   │
+│                         +-----------------------------------+   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        SQLite3 数据库                            │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐          │
+│  │ admin.db │ │account.db│ │billing.db│ │finance.db│          │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘          │
+│  ┌──────────────────────────────────────────────────┐          │
+│  │           loginout{year}.db (按年分表)            │          │
+│  └──────────────────────────────────────────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 模块依赖关系
+
+```
+                    ┌─────────────┐
+                    │    Main     │
+                    └──────┬──────┘
+                           │
+                    ┌──────▼──────┐
+                    │    menu     │
+                    └──────┬──────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         │                 │                 │
+    ┌────▼────┐       ┌────▼────┐       ┌────▼────┐
+    │service  │       │service  │       │service  │
+    │  1-6    │       │  2      │       │  3-5    │
+    └────┬────┘       └────┬────┘       └────┬────┘
+         │                 │                 │
+    ┌────▼─────────────────▼─────────────────▼────┐
+    │           业务服务层 (services/)             │
+    │  account  loginout  billing  finance  admin │
+    └────┬─────────────────┬─────────────────┬────┘
+         │                 │                 │
+    ┌────▼─────────────────▼─────────────────▼────┐
+    │           数据访问层 (database/)             │
+    │  accountdb  logdb  billingdb  financedb     │
+    └────┬─────────────────┬─────────────────┬────┘
+         │                 │                 │
+         └─────────────────┼─────────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │  sqlitedb   │
+                    │  (封装类)    │
+                    └──────┬──────┘
+                           │
+                    ┌──────▼──────┐
+                    │  SQLite3    │
+                    │  (数据库)    │
+                    └─────────────┘
+```
+
+---
+
+## 项目结构
+
 ```
 accountmanagement/
-├── src/                            # 源代码目录
-│   ├── Main.cpp                    # 程序入口
-│   ├── menu.cpp                    # 菜单模块实现
-│   ├── service.cpp                 # 服务调度实现
-│   ├── tool.cpp                    # 工具函数实现
-│   ├── database.cpp                # 数据库基础操作实现
-│   ├── services/                   # 业务服务模块
-│   │   ├── accountdatabase.cpp     # 账户数据库操作实现
-│   │   ├── accountservice.cpp      # 账户服务实现
-│   │   ├── billingdatabase.cpp     # 计费标准数据库操作实现
-│   │   ├── billingstandard.cpp     # 计费标准服务实现
-│   │   ├── financedatabase.cpp     # 财务数据库操作实现
-│   │   ├── financeservice.cpp      # 财务服务实现
-│   │   ├── loginout.cpp            # 上下机服务实现
-│   │   ├── loginoutdata.cpp        # 上下机数据操作实现
-│   │   ├── logsearch.cpp           # 日志查询服务实现
-│   │   └── search.cpp              # 搜索服务实现
-│   └── sqlite3/                    # SQLite3 嵌入式数据库
-│       ├── sqlite3.c
-│       ├── sqlite3.h
-│       ├── sqlite3ext.h
-│       └── shell.c
-├── include/                        # 头文件目录
-│   ├── menu.h                      # 菜单接口
-│   ├── service.h                   # 服务调度接口
-│   ├── tool.h                      # 工具函数接口
-│   ├── global.h                    # 全局变量和常量
-│   ├── model.hpp                   # 数据结构定义
-│   ├── database.h                  # 数据库基础操作接口
-│   ├── accountdatabase.h           # 账户数据库操作接口
-│   ├── accountservice.h            # 账户服务接口
-│   ├── billingdatabase.h           # 计费标准数据库操作接口
-│   ├── billingstandard.h           # 计费标准服务接口
-│   ├── financedatabase.h           # 财务数据库操作接口
-│   ├── financeservice.h            # 财务服务接口
-│   ├── loginout.h                  # 上下机服务接口
-│   ├── loginoutdata.h              # 上下机数据操作接口
-│   ├── logsearch.h                 # 日志查询服务接口
-│   └── search.h                    # 搜索服务接口
-├── data/                           # 数据存储目录
-│   └── data/
-│       └── loginout.db             # 上下机记录数据库文件
-├── build/                          # 构建输出目录
-│   └── bin/
-│       └── AccountManagement.exe   # 可执行文件
-├── CMakeLists.txt                  # CMake 构建配置
-├── README.md
-├── run.bat                         # 运行脚本
-└── compile.bat                     # 编译脚本
+├── src/                        # 源代码
+│   ├── Main.cpp                # 程序入口
+│   ├── menu.cpp                # 主菜单
+│   ├── service.cpp             # 服务调度
+│   ├── admin.cpp               # 管理员登录
+│   ├── database.cpp            # 数据库封装
+│   └── services/               # 业务模块
+│       ├── account*.cpp        # 账户相关
+│       ├── adminservice.cpp    # 管理员管理
+│       ├── billing*.cpp        # 计费相关
+│       ├── finance*.cpp        # 财务相关
+│       ├── loginout*.cpp       # 上下机相关
+│       └── logsearch.cpp       # 日志查询
+├── include/                    # 头文件
+├── data/                       # 数据库文件（运行时自动创建）
+│   ├── admin.db
+│   ├── account.db
+│   ├── billing.db
+│   ├── finance.db
+│   └── loginout.db
+├── build/                      # 编译输出
+├── CMakeLists.txt
+└── compile.bat
 ```
 
-### UML 类图
+---
 
-#### 数据结构定义
+## 数据库表结构
 
-```mermaid
-classDiagram
-    class UnitType {
-        <<enumeration>>
-        MINUTE
-        HOUR
-    }
-
-    class Account {
-        +char aName[19] 卡号
-        +char aPwd[9] 密码
-        +char nStatus[2] 卡状态
-        +time_t tStart 开卡时间
-        +time_t tEnd 截止时间
-        +float fTotalUse 累计金额
-        +time_t tLast 最后使用时间
-        +int nUseCount 使用次数
-        +float fBalance 余额
-        +int nDel 删除标记
-    }
-
-    class Billing {
-        +string sPackageId 套餐编号
-        +UnitType nUnitType 计费单位
-        +float fUnitPrice 单价
-        +int nDel 是否失效
-    }
-
-    class LogInfo {
-        +char aCardName[19] 上机卡号
-        +time_t tStart 上机时间
-        +time_t tEnd 下机时间
-        +float fAmount 消费金额
-        +float fBalance 余额
-        +int nPackageId 套餐ID
-    }
-```
-
-#### 数据库封装类
-
-```mermaid
-classDiagram
-    class sqlitedb {
-        -sqlite3* db 数据库连接
-        -string lastError 错误信息
-        +sqlitedb(dbPath) 构造函数
-        +~sqlitedb() 析构函数
-        +getLastError() 获取错误信息
-        +exec(sql, params) 执行SQL
-        +query(sql, params) 查询数据
-        +tablecreate(tableName, columnDefs) 建表
-        +insert(tableName, columns, values) 插入数据
-        +update(tableName, setClause, whereClause, params) 更新数据
-        +remove(tableName, whereClause, params) 删除数据
-        -bindParams(stmt, params) 绑定参数
-    }
-
-    sqlitedb ..> Account : queryToAccount()
-```
-
-#### 模块依赖关系
-
-```mermaid
-flowchart TB
-    subgraph 数据层
-        DB[(SQLite3)]
-        sqlitedb[sqlitedb 类]
-    end
-
-    subgraph 数据模型
-        Account[Account]
-        Billing[Billing]
-        LogInfo[LogInfo]
-        UnitType[UnitType]
-    end
-
-    subgraph 数据访问层
-        accountdb[accountdatabase]
-        billingdb[billingdatabase]
-        financedb[financedatabase]
-        loginoutdata[loginoutdata]
-    end
-
-    subgraph 服务层
-        accountsvc[accountservice]
-        loginout[loginout]
-        finance[financeservice]
-        billing[billingstandard]
-        logsearch[logsearch]
-        search[search]
-    end
-
-    subgraph 调度层
-        service[service]
-        menu[menu]
-    end
-
-    subgraph 入口
-        Main[Main]
-    end
-
-    Main --> menu
-    menu --> service
-    service --> accountsvc
-    service --> loginout
-    service --> billing
-    service --> finance
-    service --> logsearch
-    accountsvc --> accountdb
-    accountdb --> sqlitedb
-    billing --> billingdb
-    billingdb --> sqlitedb
-    finance --> financedb
-    financedb --> sqlitedb
-    loginout --> loginoutdata
-    loginoutdata --> sqlitedb
-    logsearch --> search
-    search --> sqlitedb
-    sqlitedb --> DB
-    sqlitedb --> Account
-    sqlitedb --> Billing
-    sqlitedb --> LogInfo
-    Billing --> UnitType
-```
-
-#### 模块说明
-
-| 层级 | 模块 | 接口函数 | 功能 |
-| --- | --- | --- | --- |
-| 入口层 | Main.cpp | `main()` | 程序入口 |
-| 菜单层 | menu.cpp/h | `menu()` | 主菜单 |
-| 调度层 | service.cpp/h | `service1~5()` | 服务路由：账户/使用/计费/财务/查询 |
-| 数据库层 | database.cpp/h | `sqlitedb` 类 | SQLite3 封装 |
-| 数据访问层 | accountdatabase.cpp/h | `searchaccount()` `changeaccount()` `signup()` `deletecard()` `init()` | 账户数据操作 |
-| 数据访问层 | billingdatabase.cpp/h | `newstnd()` `searchstnd()` `changestnd()` `deletestnd()` `initbilling()` `queryToBilling()` | 计费标准数据操作 |
-| 数据访问层 | financedatabase.cpp/h | - | 财务数据操作 |
-| 数据访问层 | loginoutdata.cpp/h | `login()` `logout()` `queryToLogInfo()` | 上下机数据操作 |
-| 服务层 | accountservice.cpp/h | `accountmenu()` | 账户管理菜单 |
-| 服务层 | loginout.cpp/h | `logmenu()` | 上下机菜单 |
-| 服务层 | billingstandard.cpp/h | `billingmenu()` | 计费标准菜单 |
-| 服务层 | financeservice.cpp/h | `financemenu()` | 财务服务菜单 |
-| 服务层 | logsearch.cpp/h | `searchmenu()` | 日志查询菜单 |
-| 服务层 | search.cpp/h | - | 搜索服务 |
-
-### 信息表单（数据结构定义）
-
-#### 1. 账户信息 (Account)
-
-| 字段 | 类型 | 描述 |
+### admins（管理员）
+| 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| aName | char[19] | 卡号 |
-| aPwd | char[9] | 密码 |
-| nStatus | char[2] | 卡状态（0-未上机，1-上机中，2-已注销，3-失效） |
-| tStart | time_t | 开卡时间 |
-| tEnd | time_t | 截止时间 |
-| fTotalUse | float | 累计金额 |
-| tLast | time_t | 最后使用时间 |
-| nUseCount | int | 使用次数 |
-| fBalance | float | 余额 |
-| nDel | int | 删除标记：0,1 |
+| id | INTEGER | 主键 |
+| username | TEXT | 账号（唯一） |
+| password | TEXT | 密码 |
+| createTime | TEXT | 创建时间 |
 
-#### 2. 计费套餐信息 (Billing)
-
-| 字段 | 类型 | 描述 |
+### accounts（账户）
+| 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| sPackageId | string | 套餐编号 |
-| nUnitType | UnitType | 计费单位：MINUTE-分钟，HOUR-小时 |
-| fUnitPrice | float | 单价 |
-| nDel | int | 是否失效：0-有效，1-失效 |
+| id | INTEGER | 主键 |
+| aName | TEXT | 卡号 |
+| aPwd | TEXT | 密码 |
+| nStatus | INTEGER | 状态（0-未上机，1-上机中，2-已注销） |
+| fBalance | REAL | 余额 |
+| nDel | INTEGER | 删除标记 |
 
-#### 3. 上下机日志信息 (LogInfo)
-
-| 字段 | 类型 | 描述 |
+### billings（计费套餐）
+| 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| aCardName | char[19] | 上机卡号 |
-| tStart | time_t | 上机时间 |
-| tEnd | time_t | 下机时间 |
-| fAmount | float | 消费金额 |
-| fBalance | float | 余额 |
-| nPackageId | int | 套餐ID，0表示无套餐 |
+| sPackageId | TEXT | 套餐编号 |
+| nUnitType | INTEGER | 计费单位（分钟/小时） |
+| fUnitPrice | REAL | 单价 |
 
-## 编译与组织方式改动 2026年3月13日
-- 构建方式：CMake
-- 编译指令：
-    - 初步设置：cmake -S . -B build -G "MinGW Makefiles"
-    - 编译：cmake --build build
-- 相关文件：CMakeLists.txt
-- 生成目录：build
+### finance（财务交易）
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| id | INTEGER | 主键 |
+| card_id | TEXT | 卡号 |
+| type | INTEGER | 类型（1-充值，2-退费，3-消费） |
+| amount | REAL | 金额 |
+| time | TEXT | 交易时间 |
 
-## 数据库详情
-- 存储位置：data/data 文件夹
-- 对接方式：sqlite3
-- 数据库名：
-    - account.db - 账户数据库
-    - billing.db - 计费标准数据库
-    - loginout.db - 上下机记录数据库
+### loginout{year}（上下机日志，按年分表）
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| id | INTEGER | 主键 |
+| aCardName | TEXT | 卡号 |
+| tStart | INTEGER | 上机时间 |
+| tEnd | INTEGER | 下机时间 |
+| fAmount | REAL | 消费金额 |
+
+---
 
 ## 计费规则
 
-### 套餐系统
-- 默认套餐：套餐"0"，计费单位为分钟，单价0.1元/分钟
-- 支持自定义套餐：可添加、查询、修改、删除计费套餐
-- 套餐选择：上机时可选择套餐，直接回车使用默认套餐
+### 分钟计费
+- < 15 分钟：向下取整
+- 15-60 分钟：向上取整
+- ≥ 60 分钟：向下取整
 
-### 计费取整规则
-
-#### 分钟计费
-- 上网时间 < 15分钟：向下取整
-- 15分钟 ≤ 上网时间 < 60分钟：向上取整
-- 上网时间 ≥ 60分钟：向下取整
-
-#### 小时计费
+### 小时计费
 - 全部向上取整
 
-### 示例
-- 上机14分钟：计费14分钟
-- 上机16分钟：计费16分钟
-- 上机65分钟：计费65分钟
-- 上机1.2小时：计费2小时
+---
 
-## 其他预设
-- 第一个用户账号：
-    - username: 10000000
-    - password: 11111111
+## 编译
+
+```bash
+# 配置
+cmake -S . -B build -G "MinGW Makefiles"
+
+# 编译
+cmake --build build
+```
+
+或使用 `compile.bat` 快速编译。
+
+---
+
+## 注意事项
+
+1. 首次运行自动创建 `data/` 目录和数据库文件
+2. 所有密码输入均采用 `*` 号隐藏显示
+3. 已注销账号可重新启用，信息自动初始化
+4. 上下机日志按年份自动分表存储

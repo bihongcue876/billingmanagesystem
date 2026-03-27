@@ -17,13 +17,13 @@ void financemenu(){
     char ch;
     while (true) {
         cout << "\n--------财务服务目录--------" << endl;
-        cout << "1. 账户充值\n2. 账户退费\n3. 账户消费记录\n4. 营业额统计\n0. 退出服务\n" << endl;
+        cout << "1. 账户充值\n2. 账户退费\n3. 账户消费记录\n4. 营业额统计\n0. 返回主菜单\n" << endl;
         cout << "输入数字指令以继续：";
         cin >> ch;
         cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在退出账户服务\n" << endl;
+                cout << "正在返回主菜单\n" << endl;
                 return;
             case '1':
                 cout << "账户充值\n" << endl;
