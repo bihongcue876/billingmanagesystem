@@ -76,7 +76,13 @@ void topup(void){
         cout << "获取账户信息失败！" << endl;
         return;
     }
-    float balanceBefore = stof(result[0][0]);
+    float balanceBefore;
+    try {
+        balanceBefore = stof(result[0][0]);
+    } catch (const std::exception& e) {
+        cout << "账户余额数据格式错误！" << endl;
+        return;
+    }
     
     cout << "请输入充值金额：";
     cin >> amount;
@@ -134,7 +140,13 @@ void refund(void){
         cout << "获取账户信息失败！" << endl;
         return;
     }
-    float balanceBefore = stof(result[0][0]);
+    float balanceBefore;
+    try {
+        balanceBefore = stof(result[0][0]);
+    } catch (const std::exception& e) {
+        cout << "账户余额数据格式错误！" << endl;
+        return;
+    }
     
     cout << "请输入退费金额：";
     cin >> amount;

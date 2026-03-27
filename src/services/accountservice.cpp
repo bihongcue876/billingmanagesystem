@@ -69,8 +69,8 @@ typedef struct Account{
 void accountsearch(void){
     cout<<"--------卡号查询--------"<<endl;
     cout<<"请输入需要查询的卡号：";
-    char idn[18]; // 卡号
-    cin.width(18);
+    char idn[19]; // 卡号
+    cin.width(19);
     cin>>idn;
     int status;
     status=searchaccount(idn);
@@ -94,8 +94,8 @@ void accountsearch(void){
 void accountchange(void){
     cout<<"--------信息更改--------"<<endl;
     cout<<"请输入需要更改的卡号：";
-    char idn[18]; // 卡号
-    cin.width(18);
+    char idn[19]; // 卡号
+    cin.width(19);
     cin>>idn;
     changeaccount(idn);
 }// 账户信息变更
@@ -108,8 +108,8 @@ void signupaccount(void){
 void deleteaccount(void){
     cout<<"--------注销--------"<<endl;
     cout<<"请输入需要注销的卡号：";
-    char idn[18]; // 卡号
-    cin.width(18);
+    char idn[19]; // 卡号
+    cin.width(19);
     cin>>idn;
     deletecard(idn);
 }// 注销账户

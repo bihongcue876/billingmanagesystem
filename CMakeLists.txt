@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-# 项目名称和版本 - 支持C和C++混合编译
+# 项目名称和版本 - 支持 C 和 C++ 混合编译
 project(AccountManagement VERSION 1.0.0 LANGUAGES C CXX)
 
-# 设置C++标准
+# 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 设置C标准
+# 设置 C 标准
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# 设置输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# 设置输出目录 - 可执行文件输出到项目根目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
@@ -22,13 +22,13 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/sqlite3
 )
 
-# 分别查找C和C++源文件
-file(GLOB_RECURSE CPP_SOURCES 
+# 分别查找 C 和 C++ 源文件
+file(GLOB_RECURSE CPP_SOURCES
     "src/*.cpp"
     "src/services/*.cpp"
 )
 
-file(GLOB_RECURSE C_SOURCES 
+file(GLOB_RECURSE C_SOURCES
     "src/sqlite3/*.c"
 )
 
@@ -39,26 +39,28 @@ get_target_property(OUT_DIR ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
 message(STATUS "Runtime output directory for ${PROJECT_NAME}: ${OUT_DIR}")
 
 # 设置目标属性
-target_compile_definitions(${PROJECT_NAME} PRIVATE 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
     _CRT_SECURE_NO_WARNINGS
 )
 
-# 为C文件设置编译选项 - 禁用C++严格类型检查
-set_source_files_properties(${C_SOURCES} PROPERTIES
-    COMPILE_FLAGS "-fpermissive"
-)
+# 为 C 文件设置编译选项 - 禁用 C++ 严格类型检查（仅 GCC/Clang）
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set_source_files_properties(${C_SOURCES} PROPERTIES
+        COMPILE_FLAGS "-fpermissive"
+    )
+endif()
 
 # 链接库
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
 endif()
 
-# 安装目标
+# 安装目标（可选）
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
 )
 
-# 安装头文件
+# 安装头文件（可选）
 install(DIRECTORY include/
     DESTINATION include
     FILES_MATCHING PATTERN "*.h"
@@ -87,7 +89,7 @@ else()
 endif()
 
 # 显示构建信息
-message(STATUS "项目名称: ${PROJECT_NAME}")
-message(STATUS "构建类型: ${CMAKE_BUILD_TYPE}")
-message(STATUS "源文件数量: ${SOURCES}")
-message(STATUS "C++标准: ${CMAKE_CXX_STANDARD}")
+message(STATUS "项目名称：${PROJECT_NAME}")
+message(STATUS "构建类型：${CMAKE_BUILD_TYPE}")
+message(STATUS "C++ 标准：${CMAKE_CXX_STANDARD}")
+message(STATUS "可执行文件输出目录：${CMAKE_SOURCE_DIR}")

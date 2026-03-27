@@ -1,39 +1,45 @@
-# Build directories (except build/bin)
-build/*
-!build/bin/
-!build/bin/*
+# 整个 build 目录（CMake 生成目录）
+build/
 
-# CMake files
-CMakeFiles/
+# CMake 生成的文件（根目录）
 CMakeCache.txt
 cmake_install.cmake
-
-# Makefiles
 Makefile
-*.make
 
-# Compiled Object files
+# 编译中间产物
 *.o
 *.obj
+*.a
+*.lib
 *.so
 *.dylib
 *.dll
+*.pdb
+*.ilk
+*.exp
+*.manifest
 
-# Executables (outside build/bin)
+# 编译器临时文件
+*.deps
+*.d
+*.idb
+*.ipdb
+*.iobj
+
+# 可执行文件（输出到项目根目录）
 *.exe
 *.out
-*.app
 
-# Database files
+# 数据库文件
 data/*.db
 
-# IDE files
+# IDE 文件
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS files
+# 系统文件
 .DS_Store
 Thumbs.db

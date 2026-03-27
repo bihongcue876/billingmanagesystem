@@ -7,7 +7,7 @@
 
 using namespace std;
 
-sqlitedb financedb(DATA_ROOT"data/finance.db");
+sqlitedb financedb(DATA_ROOT"finance.db");
 
 void initfinance() {
     const char* columnDefs = 
@@ -76,11 +76,15 @@ float sumAmountByType(int type) {
     vector<const char*> params = {typeStr.c_str()};
     vector<vector<string>> rows = financedb.query(
         "SELECT SUM(amount) FROM finance WHERE type=?", params);
-    
+
     if (rows.empty() || rows[0][0] == "NULL") {
         return 0.0f;
     }
-    return stof(rows[0][0]);
+    try {
+        return stof(rows[0][0]);
+    } catch (const std::exception& e) {
+        return 0.0f;
+    }
 }
 
 Finance queryToFinance(const vector<vector<string>>& result, int index) {
@@ -88,16 +92,23 @@ Finance queryToFinance(const vector<vector<string>>& result, int index) {
     f.id = 0;
     f.type = 0;
     f.amount = 0.0f;
-    
+
     if (index >= 0 && index < (int)result.size()) {
         const auto& row = result[index];
         if (row.size() >= 6) {
-            f.id = stoi(row[0]);
-            f.cardId = row[1];
-            f.type = stoi(row[2]);
-            f.amount = stof(row[3]);
-            f.remark = row[4];
-            f.time = row[5];
+            try {
+                f.id = stoi(row[0]);
+                f.cardId = row[1];
+                f.type = stoi(row[2]);
+                f.amount = stof(row[3]);
+                f.remark = row[4];
+                f.time = row[5];
+            } catch (const std::exception& e) {
+                // 数据格式错误，返回零初始化的对象
+                f.id = 0;
+                f.type = 0;
+                f.amount = 0.0f;
+            }
         }
     }
     return f;

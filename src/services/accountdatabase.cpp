@@ -2,12 +2,12 @@
 #include <ctime>
 #include <string>
 #include <vector>
-#include <conio.h> // 用于 getch() 函数，用于密码保密输入
+#include <conio.h>
 #include "sqlite3.h"
 #include "accountdatabase.h"
-
 #include "model.hpp"
 #include "database.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -164,7 +164,7 @@ void signup(void){
     acc.nDel = 0;
     acc.nStatus[0] = '0';
     acc.nStatus[1] = '\0';
-    vector<const char*> columns = {"aName", "aPwd", "nStatus", "tStart", "tEnd", "fTotalUse", "tLast", "nUseCount", "fBalance", "nDel"};
+    // 准备插入数据：先转换数值类型为字符串，再构建参数列表
     string tStartStr   = to_string(acc.tStart);
     string tEndStr     = to_string(acc.tEnd);
     string totalUseStr = to_string(acc.fTotalUse);
@@ -172,6 +172,7 @@ void signup(void){
     string useCountStr = to_string(acc.nUseCount);
     string balanceStr  = to_string(acc.fBalance);
     string delStr      = to_string(acc.nDel);
+    vector<const char*> columns = {"aName", "aPwd", "nStatus", "tStart", "tEnd", "fTotalUse", "tLast", "nUseCount", "fBalance", "nDel"};
     vector<const char*> values = {
         acc.aName,
         acc.aPwd,
@@ -196,7 +197,6 @@ void deletecard(char* cardname){
     time_t tEnd = time(nullptr);
     int nDel = 1;
     int nStatus = 2;
-    // 使用局部 string 保存数值型字段，避免悬空指针
     string statusStr = to_string(nStatus);
     string tEndStr   = to_string(tEnd);
     string delStr    = to_string(nDel);

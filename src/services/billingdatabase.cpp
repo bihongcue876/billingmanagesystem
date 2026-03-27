@@ -240,14 +240,23 @@ bool deletestnd(const string& id){
 
 Billing queryToBilling(const vector<vector<string>>& result, int index){
     Billing billing;
+    billing.sPackageId = "";
+    billing.nUnitType = UnitType::MINUTE;
+    billing.fUnitPrice = 0.0f;
+    billing.nDel = 0;
+    
     if(index >= 0 && index < result.size()){
         const auto& row = result[index];
         if(row.size() >= 4){
-            billing.sPackageId = row[0];
-            int unitTypeValue = stoi(row[1]);
-            billing.nUnitType = static_cast<UnitType>(unitTypeValue);
-            billing.fUnitPrice = stof(row[2]);
-            billing.nDel = stoi(row[3]);
+            try {
+                billing.sPackageId = row[0];
+                int unitTypeValue = stoi(row[1]);
+                billing.nUnitType = static_cast<UnitType>(unitTypeValue);
+                billing.fUnitPrice = stof(row[2]);
+                billing.nDel = stoi(row[3]);
+            } catch (const std::exception& e) {
+                // 数据格式错误，返回零初始化的对象
+            }
         }
     }
     return billing;

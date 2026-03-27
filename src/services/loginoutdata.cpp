@@ -299,11 +299,19 @@ LogInfo queryToLogInfo(const vector<vector<string>>& result, int index){
     }
     strncpy(log.aCardName, row[0].c_str(), 18);
     log.aCardName[18] = '\0';
-    log.tStart = stol(row[1]);
-    log.tEnd = stol(row[2]);
-    log.fAmount = stof(row[3]);
-    log.fBalance = stof(row[4]);
-    log.nPackageId = row.size() > 5 ? stoi(row[5]) : 0;
+    
+    // 转换数值类型，捕获可能的异常
+    try {
+        log.tStart = stol(row[1]);
+        log.tEnd = stol(row[2]);
+        log.fAmount = stof(row[3]);
+        log.fBalance = stof(row[4]);
+        log.nPackageId = row.size() > 5 ? stoi(row[5]) : 0;
+    } catch (const std::exception& e) {
+        // 数据格式错误，返回零初始化的对象
+        memset(&log, 0, sizeof(LogInfo));
+        return log;
+    }
     return log;
 }
 

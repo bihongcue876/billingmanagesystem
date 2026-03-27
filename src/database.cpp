@@ -355,30 +355,38 @@ Account queryToAccount(const vector<vector<string>>& result, int index) {
     }
     
     const vector<string>& row = result[index];
-    
+
     // 检查列数是否足够
     if(row.size() < 10) {
         memset(&acc, 0, sizeof(Account));
         return acc;
     }
-    
+
     // 逐字段填充 Account 结构体
     strncpy(acc.aName, row[0].c_str(), 18);
     acc.aName[18] = '\0';
-    
+
     strncpy(acc.aPwd, row[1].c_str(), 8);
     acc.aPwd[8] = '\0';
-    
+
     strncpy(acc.nStatus, row[2].c_str(), 1);
     acc.nStatus[1] = '\0';
-    
-    acc.tStart = stol(row[3]);      // 开卡时间
-    acc.tEnd = stol(row[4]);        // 截止时间
-    acc.fTotalUse = stof(row[5]);   // 累计消费
-    acc.tLast = stol(row[6]);       // 最后使用时间
-    acc.nUseCount = stoi(row[7]);   // 使用次数
-    acc.fBalance = stof(row[8]);    // 余额
-    acc.nDel = stoi(row[9]);        // 删除标记
-    
+
+    // 转换数值类型，捕获可能的异常
+    try {
+        acc.tStart = stol(row[3]);      // 开卡时间
+        acc.tEnd = stol(row[4]);        // 截止时间
+        acc.fTotalUse = stof(row[5]);   // 累计消费
+        acc.tLast = stol(row[6]);       // 最后使用时间
+        acc.nUseCount = stoi(row[7]);   // 使用次数
+        acc.fBalance = stof(row[8]);    // 余额
+        acc.nDel = stoi(row[9]);        // 删除标记
+    } catch (const std::exception& e) {
+        // 数据格式错误，返回零初始化的对象
+        // 调用方应检查返回的对象是否有效
+        memset(&acc, 0, sizeof(Account));
+        return acc;
+    }
+
     return acc;
 }
