@@ -10,26 +10,31 @@ void alogout(void);
 void logmenu(void){
     char ch;
     while (true) {
-        cout << "\n--------上下机服务目录--------" << endl;
-        cout << "1. 用户上机\n2. 用户下机\n0. 返回主菜单\n" << endl;
-        cout << "输入数字指令以继续：";
+        cout << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "     上下机服务目录" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "  1. 用户上机" << endl;
+        cout << "  2. 用户下机" << endl;
+        cout << "  0. 返回主菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "请输入选项：";
         cin >> ch;
-        cin.ignore(1024, '\n'); // 忽略后面的东西
+        cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在返回主菜单" << endl;
+                cout << "\n正在返回主菜单..." << endl;
                 return;
-                break;
             case '1':
-                cout << "用户上机\n" << endl;
+                cout << "\n>> 用户上机" << endl;
                 alogin();
                 break;
             case '2':
-                cout << "用户下机\n" << endl;
+                cout << "\n>> 用户下机" << endl;
                 alogout();
                 break;
             default:
-                cout << "输入指令不正确，请重新输入\n" << endl;
+                cout << "\n输入指令不正确，请重新输入" << endl;
                 break;
         }
     }
@@ -42,7 +47,7 @@ void alogin(void){
     cin.width(19);
     cin >> idn;
     cin.ignore(1024, '\n');
-    
+
     int status = login(idn);
     switch(status){
         case 0:
@@ -74,7 +79,7 @@ void alogout(void){
     cin.width(19);
     cin >> idn;
     cin.ignore(1024, '\n');
-    
+
     int status = logout(idn);
     switch(status){
         case 0:

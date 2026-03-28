@@ -13,6 +13,9 @@
 // SQLite 回调函数（未使用）
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);
 
+// 将 SQLite 错误码转换为友好的中文提示
+std::string getFriendlyErrorMessage(int errorCode);
+
 // SQLite 数据库操作封装类
 class sqlitedb {
 public:

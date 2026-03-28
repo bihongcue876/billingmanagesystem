@@ -12,37 +12,51 @@ void topup(void);// 充值
 void refund(void);// 退费
 void history(void);// 历史
 void statistics(void);// 统计
+void historyByDate(void);// 按日期查询
 
 void financemenu(){
     char ch;
     while (true) {
-        cout << "\n--------财务服务目录--------" << endl;
-        cout << "1. 账户充值\n2. 账户退费\n3. 账户消费记录\n4. 营业额统计\n0. 返回主菜单\n" << endl;
-        cout << "输入数字指令以继续：";
+        cout << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "     财务服务目录" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "  1. 账户充值" << endl;
+        cout << "  2. 账户退费" << endl;
+        cout << "  3. 账户消费记录" << endl;
+        cout << "  4. 营业额统计" << endl;
+        cout << "  5. 按日期查询" << endl;
+        cout << "  0. 返回主菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "请输入选项：";
         cin >> ch;
         cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在返回主菜单\n" << endl;
+                cout << "\n正在返回主菜单..." << endl;
                 return;
             case '1':
-                cout << "账户充值\n" << endl;
+                cout << "\n>> 账户充值" << endl;
                 topup();
                 break;
             case '2':
-                cout << "账户退费\n" << endl;
+                cout << "\n>> 账户退费" << endl;
                 refund();
                 break;
             case '3':
-                cout << "账户消费记录\n" << endl;
+                cout << "\n>> 账户消费记录" << endl;
                 history();
                 break;
             case '4':
-                cout << "营业额统计\n" << endl;
+                cout << "\n>> 营业额统计" << endl;
                 statistics();
                 break;
+            case '5':
+                cout << "\n>> 按日期查询" << endl;
+                historyByDate();
+                break;
             default:
-                cout << "输入指令不正确，请重新输入\n" << endl;
+                cout << "\n输入指令不正确，请重新输入" << endl;
         }
     }
 }
@@ -87,12 +101,24 @@ void topup(void){
     cout << "请输入充值金额：";
     cin >> amount;
     cin.ignore(1024, '\n');
-    
+
     if(amount <= 0){
         cout << "充值金额必须大于 0！" << endl;
         return;
     }
-    
+
+    // 大额充值确认（超过 500 元）
+    if(amount > 500){
+        cout << "警告：充值金额较大（" << amount << " 元），确定继续吗？(y/n)：";
+        char choice;
+        cin >> choice;
+        cin.ignore(1024, '\n');
+        if(choice != 'y' && choice != 'Y'){
+            cout << "已取消充值" << endl;
+            return;
+        }
+    }
+
     float newBalance = balanceBefore + amount;
     
     // 更新账户余额
@@ -151,17 +177,29 @@ void refund(void){
     cout << "请输入退费金额：";
     cin >> amount;
     cin.ignore(1024, '\n');
-    
+
     if(amount <= 0){
         cout << "退费金额必须大于 0！" << endl;
         return;
     }
-    
+
     if(amount > balanceBefore){
         cout << "退费金额不能超过当前余额（" << balanceBefore << "元）！" << endl;
         return;
     }
-    
+
+    // 大额退费确认（超过 500 元）
+    if(amount > 500){
+        cout << "警告：退费金额较大（" << amount << " 元），确定继续吗？(y/n)：";
+        char choice;
+        cin >> choice;
+        cin.ignore(1024, '\n');
+        if(choice != 'y' && choice != 'Y'){
+            cout << "已取消退费" << endl;
+            return;
+        }
+    }
+
     float newBalance = balanceBefore - amount;
     
     // 更新账户余额
@@ -226,3 +264,66 @@ void statistics(void){
     cout << "消费总额：" << totalConsumption << " 元" << endl;
     cout << "净营业额：" << (totalTopup - totalRefund) << " 元" << endl;
 }// 统计
+
+void historyByDate(void){
+    initfinance();
+
+    string startDate, endDate;
+    cout << "请输入开始日期（格式：YYYY-MM-DD）：";
+    getline(cin, startDate);
+    cout << "请输入结束日期（格式：YYYY-MM-DD）：";
+    getline(cin, endDate);
+
+    if(startDate.empty() || endDate.empty()){
+        cout << "日期不能为空！" << endl;
+        return;
+    }
+
+    // 将日期扩展为完整的日期时间范围
+    // 开始日期：YYYY-MM-DD 00:00:00
+    // 结束日期：YYYY-MM-DD 23:59:59
+    string startDateTime = startDate + " 00:00:00";
+    string endDateTime = endDate + " 23:59:59";
+
+    // 查询指定日期范围的交易记录
+    vector<const char*> params = {startDateTime.c_str(), endDateTime.c_str()};
+    vector<vector<string>> result = financedb.query(
+        "SELECT id, card_id, type, amount, remark, time FROM finance "
+        "WHERE time >= ? AND time <= ? ORDER BY time DESC", params);
+
+    if(result.empty()){
+        cout << "未找到指定日期范围的交易记录！" << endl;
+        return;
+    }
+
+    cout << "ID\t卡号\t类型\t金额\t备注\t时间" << endl;
+    cout << "------------------------------------------------------------" << endl;
+
+    float totalAmount = 0.0f;
+    int count = 0;
+
+    for(size_t i = 0; i < result.size(); i++){
+        const vector<string>& row = result[i];
+        if(row.size() < 6) continue;
+
+        string typeStr;
+        int type = stoi(row[2]);
+        float amount = stof(row[3]);
+
+        if(type == 1) typeStr = "充值";
+        else if(type == 2) typeStr = "退费";
+        else if(type == 3) typeStr = "消费";
+        else typeStr = "未知";
+
+        cout << row[0] << "\t" << row[1] << "\t"
+             << typeStr << "\t" << amount << "\t"
+             << row[4] << "\t" << row[5] << endl;
+
+        if(type == 1) totalAmount += amount;
+        else if(type == 2) totalAmount -= amount;
+        count++;
+    }
+
+    cout << "------------------------------------------------------------" << endl;
+    cout << "共计 " << count << " 条记录，净营业额：" << totalAmount << " 元" << endl;
+}// 按日期查询

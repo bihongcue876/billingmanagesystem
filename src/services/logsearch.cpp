@@ -17,6 +17,7 @@ extern sqlitedb logdb;
 void totalsales(void);
 void uselogs(void);
 void logprint(void);
+void logsByDate(void);  // 按日期查询日志
 
 // 获取当前年份的上下机日志表名
 static string getLogTableName(){
@@ -30,34 +31,47 @@ static string getLogTableName(){
 void searchmenu(void){
     char ch;
     while (true) {
-        cout << "\n--------查询统计菜单--------" << endl;
-        cout << "1. 营业额日志\n2. 上下机日志\n3. 日志打印管理\n0. 返回主菜单\n" << endl;
-        cout << "输入数字指令以继续：";
+        cout << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "     查询统计菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "  1. 营业额日志" << endl;
+        cout << "  2. 上下机日志" << endl;
+        cout << "  3. 日志打印管理" << endl;
+        cout << "  4. 按日期查询" << endl;
+        cout << "  0. 返回主菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "请输入选项：";
         cin >> ch;
         cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在返回主菜单\n" << endl;
+                cout << "\n正在返回主菜单..." << endl;
                 return;
-                break;
             case '1':
-                cout << "营业额与日志\n" << endl;
+                cout << "\n>> 营业额日志" << endl;
                 totalsales();
                 break;
             case '2':
-                cout << "上下机日志\n" << endl;
+                cout << "\n>> 上下机日志" << endl;
                 uselogs();
                 break;
             case '3':
-                cout << "日志打印与管理\n" << endl;
+                cout << "\n>> 日志打印管理" << endl;
                 logprint();
                 break;
+            case '4':
+                cout << "\n>> 按日期查询" << endl;
+                logsByDate();
+                break;
             default:
-                cout << "输入指令不正确，请重新输入\n" << endl;
+                cout << "\n输入指令不正确，请重新输入" << endl;
                 break;
         }
     }
 }
+
+void logsByDate(void);  // 按日期查询日志
 
 // 营业额与日志 - 显示所有财务交易记录并统计
 void totalsales(void){
@@ -206,7 +220,7 @@ void logprint(void){
     
     cout << "--------------------------------------------------------------------------------" << endl;
     cout << "共计 " << count << " 条记录，总消费：" << totalAmount << " 元" << endl;
-    
+
     // 询问是否打印（模拟）
     cout << "\n是否打印以上记录？(y/n)：";
     char choice;
@@ -215,4 +229,96 @@ void logprint(void){
         cout << "正在打印..." << endl;
         cout << "[打印功能已模拟完成]" << endl;
     }
+}
+
+// 按日期查询上下机日志
+void logsByDate(void){
+    cout << "=== 按日期查询上下机日志 ===" << endl;
+
+    string startDate, endDate;
+    cout << "请输入开始日期（格式：YYYY-MM-DD）：";
+    getline(cin, startDate);
+    cout << "请输入结束日期（格式：YYYY-MM-DD）：";
+    getline(cin, endDate);
+
+    if(startDate.empty() || endDate.empty()){
+        cout << "日期不能为空！" << endl;
+        return;
+    }
+
+    extern sqlitedb logdb;
+    string tableName = getLogTableName();
+
+    // 将日期字符串转换为时间戳（简化处理）
+    // 格式：YYYY-MM-DD
+    int startYear, startMonth, startDay;
+    int endYear, endMonth, endDay;
+    
+    sscanf(startDate.c_str(), "%d-%d-%d", &startYear, &startMonth, &startDay);
+    sscanf(endDate.c_str(), "%d-%d-%d", &endYear, &endMonth, &endDay);
+
+    struct tm startTime = {};
+    struct tm endTime = {};
+    startTime.tm_year = startYear - 1900;
+    startTime.tm_mon = startMonth - 1;
+    startTime.tm_mday = startDay;
+    startTime.tm_hour = 0;
+    startTime.tm_min = 0;
+    startTime.tm_sec = 0;
+
+    endTime.tm_year = endYear - 1900;
+    endTime.tm_mon = endMonth - 1;
+    endTime.tm_mday = endDay;
+    endTime.tm_hour = 23;
+    endTime.tm_min = 59;
+    endTime.tm_sec = 59;
+
+    time_t startTimestamp = mktime(&startTime);
+    time_t endTimestamp = mktime(&endTime);
+
+    // 查询指定日期范围的日志记录
+    string sql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance, nPackageId FROM " + 
+                 tableName + " WHERE tStart >= ? AND tStart <= ? AND tEnd != -1 ORDER BY tStart DESC";
+
+    string startStr = to_string(startTimestamp);
+    string endStr = to_string(endTimestamp);
+    vector<const char*> params = {startStr.c_str(), endStr.c_str()};
+    vector<vector<string>> result = logdb.query(sql.c_str(), params);
+
+    if(result.empty()){
+        cout << "未找到指定日期范围的上下机记录！" << endl;
+        return;
+    }
+
+    cout << "ID\t卡号\t上机时间\t\t下机时间\t\t消费金额\t余额\t套餐" << endl;
+    cout << "--------------------------------------------------------------------------------" << endl;
+
+    float totalAmount = 0.0f;
+    int count = 0;
+
+    for(size_t i = 0; i < result.size(); i++){
+        const vector<string>& row = result[i];
+        if(row.size() < 7) continue;
+
+        time_t tStart = stol(row[2]);
+        time_t tEnd = stol(row[3]);
+
+        struct tm* startInfo = localtime(&tStart);
+        struct tm* endInfo = localtime(&tEnd);
+
+        char startTimeStr[32], endTimeStr[32];
+        strftime(startTimeStr, sizeof(startTimeStr), "%Y/%m/%d %H:%M:%S", startInfo);
+        strftime(endTimeStr, sizeof(endTimeStr), "%Y/%m/%d %H:%M:%S", endInfo);
+
+        string packageStr = (row[6] == "0") ? "无" : row[6];
+        float amount = stof(row[4]);
+        totalAmount += amount;
+        count++;
+
+        cout << row[0] << "\t" << row[1] << "\t" << startTimeStr << "\t" << endTimeStr << "\t"
+             << amount << "\t" << row[5] << "\t" << packageStr << endl;
+    }
+
+    cout << "--------------------------------------------------------------------------------" << endl;
+    cout << "共计 " << count << " 条记录，总消费：" << totalAmount << " 元" << endl;
 }

@@ -16,6 +16,17 @@ sqlitedb billingdb(DATA_ROOT"billing.db");
 void initbilling(){
     const char* columnDefs = "sPackageId TEXT PRIMARY KEY, nUnitType INTEGER, fUnitPrice REAL, nDel INTEGER";
     billingdb.tablecreate("billings", columnDefs);
+    
+    // 检查默认套餐"0"是否存在，不存在则创建
+    vector<vector<string>> checkResult = billingdb.query("SELECT sPackageId FROM billings WHERE sPackageId='0'");
+    if(checkResult.empty()){
+        vector<const char*> columns = {"sPackageId", "nUnitType", "fUnitPrice", "nDel"};
+        string unitTypeStr = to_string(static_cast<int>(UnitType::MINUTE));
+        string unitPriceStr = to_string(0.1f);
+        string delStr = to_string(0);
+        vector<const char*> values = {"0", unitTypeStr.c_str(), unitPriceStr.c_str(), delStr.c_str()};
+        billingdb.insert("billings", columns, values);
+    }
 }
 
 bool newstnd(void){

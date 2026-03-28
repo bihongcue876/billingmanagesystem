@@ -51,6 +51,11 @@ static string getLogTableName(){
 // 上机登录函数
 // 返回值：0-成功，1-余额不足，2-卡号已注销或被禁用，3-卡号已在使用中，4-其他错误
 int login(const char* cardname){
+    // 检查卡号格式
+    if(!checkCardNameFormat(cardname)){
+        return 4;
+    }
+    
     init();
     initLogTable();
 
@@ -190,6 +195,11 @@ int login(const char* cardname){
 // 下机登出函数
 // 返回值：0-成功下机，1-下机成功但欠费，2-卡号已注销，3-卡号未上机，4-其他错误
 int logout(const char* cardname){
+    // 检查卡号格式
+    if(!checkCardNameFormat(cardname)){
+        return 4;
+    }
+    
     init();
     initLogTable();
 

@@ -184,39 +184,47 @@ void adminList(){
 void adminmenu(){
     char ch;
     while (true) {
-        cout << "\n--------管理员管理--------" << endl;
-        cout << "1. 修改密码\n2. 添加管理员\n3. 删除管理员\n4. 管理员列表\n0. 返回主菜单\n" << endl;
-        cout << "输入数字指令以继续：";
+        cout << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "     管理员管理" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "  1. 修改密码" << endl;
+        cout << "  2. 添加管理员" << endl;
+        cout << "  3. 删除管理员" << endl;
+        cout << "  4. 管理员列表" << endl;
+        cout << "  0. 返回主菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "请输入选项：";
         cin >> ch;
         cin.ignore(1024, '\n');
 
         switch (ch) {
             case '0':
-                cout << "正在返回主菜单\n" << endl;
+                cout << "\n正在返回主菜单..." << endl;
                 return;
 
             case '1':
-                cout << "修改密码\n" << endl;
+                cout << "\n>> 修改密码" << endl;
                 changePassword(g_currentAdmin);
                 break;
 
             case '2':
-                cout << "添加管理员\n" << endl;
+                cout << "\n>> 添加管理员" << endl;
                 addAdmin(g_currentAdmin);
                 break;
 
             case '3':
-                cout << "删除管理员\n" << endl;
+                cout << "\n>> 删除管理员" << endl;
                 deleteAdmin();
                 break;
 
             case '4':
-                cout << "管理员列表\n" << endl;
+                cout << "\n>> 管理员列表" << endl;
                 adminList();
                 break;
 
             default:
-                cout << "输入指令不正确，请重新输入\n" << endl;
+                cout << "\n输入指令不正确，请重新输入" << endl;
                 break;
         }
     }

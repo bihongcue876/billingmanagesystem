@@ -7,6 +7,66 @@
 
 using namespace std;
 
+// 将 SQLite 错误码转换为友好的中文提示
+string getFriendlyErrorMessage(int errorCode){
+    switch(errorCode){
+        case SQLITE_OK:
+            return "操作成功";
+        case SQLITE_ERROR:
+            return "SQL 语法错误";
+        case SQLITE_INTERNAL:
+            return "数据库内部错误";
+        case SQLITE_PERM:
+            return "权限不足";
+        case SQLITE_ABORT:
+            return "操作已中止";
+        case SQLITE_BUSY:
+            return "数据库正忙，请稍后重试";
+        case SQLITE_LOCKED:
+            return "数据库已锁定";
+        case SQLITE_NOMEM:
+            return "内存不足";
+        case SQLITE_READONLY:
+            return "数据库为只读模式";
+        case SQLITE_INTERRUPT:
+            return "操作已中断";
+        case SQLITE_IOERR:
+            return "读写错误，请检查文件是否存在";
+        case SQLITE_CORRUPT:
+            return "数据库文件已损坏";
+        case SQLITE_NOTFOUND:
+            return "未找到数据库文件";
+        case SQLITE_FULL:
+            return "数据库已满";
+        case SQLITE_CANTOPEN:
+            return "无法打开数据库文件，请检查路径是否正确";
+        case SQLITE_PROTOCOL:
+            return "协议错误";
+        case SQLITE_EMPTY:
+            return "数据库为空";
+        case SQLITE_SCHEMA:
+            return "数据库架构变更";
+        case SQLITE_TOOBIG:
+            return "数据过大";
+        case SQLITE_CONSTRAINT:
+            return "违反约束条件（可能是数据重复）";
+        case SQLITE_MISMATCH:
+            return "数据类型不匹配";
+        case SQLITE_MISUSE:
+            return "数据库使用不当";
+        case SQLITE_NOLFS:
+            return "不支持大文件";
+        case SQLITE_AUTH:
+            return "认证失败";
+        case SQLITE_RANGE:
+            return "参数超出范围";
+        case SQLITE_NOTADB:
+            return "不是有效的数据库文件";
+        default:
+            return "未知错误（代码：" + to_string(errorCode) + "）";
+    }
+}
+
 // ==================== 辅助函数 ====================
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
@@ -27,9 +87,9 @@ sqlitedb::sqlitedb(const char* dbPath) {
     // 打开数据库连接
     int rc = sqlite3_open(dbPath, &db);
     if(rc) {
-        string err = sqlite3_errmsg(db);
+        string err = getFriendlyErrorMessage(rc);
         sqlite3_close(db);
-        throw runtime_error("无法连接数据库：" + err);
+        throw runtime_error(err);
     }
 }
 
@@ -56,21 +116,21 @@ void sqlitedb::bindParams(sqlite3_stmt* stmt, const std::vector<const char*>& pa
 bool sqlitedb::exec(const char* sql, const std::vector<const char*>& params) {
     sqlite3_stmt* stmt = nullptr;
     const char* tail = nullptr;
-    
+
     // 预编译 SQL 语句
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
     if (rc != SQLITE_OK) {
-        lastError = sqlite3_errmsg(db);
+        lastError = getFriendlyErrorMessage(rc);
         return false;
     }
-    
+
     // 绑定参数
     bindParams(stmt, params);
-    
+
     // 执行语句
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        lastError = sqlite3_errmsg(db);
+        lastError = getFriendlyErrorMessage(rc);
         sqlite3_finalize(stmt);
         return false;
     }
@@ -89,16 +149,16 @@ std::vector<std::vector<std::string>> sqlitedb::query(const char* sql, const std
     // 将 SQL 文本编译为预编译语句对象
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
     if (rc != SQLITE_OK) {
-        lastError = sqlite3_errmsg(db);  // 记录错误信息
+        lastError = getFriendlyErrorMessage(rc);  // 记录错误信息
         return result;                    // 返回空结果
     }
-    
+
     // 绑定参数（如果有）
     bindParams(stmt, params);
-    
+
     // 获取结果集的列数
     int colCount = sqlite3_column_count(stmt);
-    
+
     // 逐行获取数据
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         std::vector<std::string> row;  // 存储当前行的各列值
@@ -113,10 +173,10 @@ std::vector<std::vector<std::string>> sqlitedb::query(const char* sql, const std
         }
         result.push_back(std::move(row));  // 将行添加到结果集（移动语义，避免拷贝）
     }
-    
+
     // 检查是否正常结束（SQLITE_DONE 表示无更多行）
     if (rc != SQLITE_DONE) {
-        lastError = sqlite3_errmsg(db);  // 记录可能的错误
+        lastError = getFriendlyErrorMessage(rc);  // 记录可能的错误
     }
     
     // 销毁预编译语句，释放资源
@@ -162,14 +222,14 @@ bool sqlitedb::insert(const char* tableName, const std::vector<const char*>& col
     const char* tail = nullptr;
     int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, &tail);
     if (rc != SQLITE_OK) {
-        lastError = sqlite3_errmsg(db);
+        lastError = getFriendlyErrorMessage(rc);
         return false;
     }
-    
+
     bindParams(stmt, values);
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        lastError = sqlite3_errmsg(db);
+        lastError = getFriendlyErrorMessage(rc);
         sqlite3_finalize(stmt);
         return false;
     }

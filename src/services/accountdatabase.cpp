@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <conio.h>
+#include <cstring>
 #include "sqlite3.h"
 #include "accountdatabase.h"
 #include "model.hpp"
@@ -11,6 +12,30 @@
 #include "financedatabase.h"
 
 using namespace std;
+
+// 检查卡号格式：只能包含字母、数字、下划线，长度 1-18 位
+bool checkCardNameFormat(const char* cardname){
+    if(cardname == nullptr || strlen(cardname) == 0){
+        cout << "卡号不能为空！" << endl;
+        return false;
+    }
+    if(strlen(cardname) > 18){
+        cout << "卡号长度不能超过 18 位！" << endl;
+        return false;
+    }
+    for(int i = 0; cardname[i] != '\0'; i++){
+        char ch = cardname[i];
+        // 只允许字母、数字、下划线
+        if(!((ch >= '0' && ch <= '9') || 
+             (ch >= 'a' && ch <= 'z') || 
+             (ch >= 'A' && ch <= 'Z') || 
+             ch == '_')){
+            cout << "卡号只能包含字母、数字、下划线！" << endl;
+            return false;
+        }
+    }
+    return true;
+}
 
 sqlitedb accountdb(DATA_ROOT"account.db");
 
@@ -27,6 +52,11 @@ string formatTime(time_t t) {
 }
 
 int searchaccount(char* cardname){
+    // 检查卡号格式
+    if(!checkCardNameFormat(cardname)){
+        return 0;
+    }
+    
     init(); // 初始化表格
     vector<const char*> params = {cardname};
     vector<vector<string>> result = accountdb.query("SELECT aName, aPwd, nStatus, tStart, tEnd, fTotalUse, tLast, nUseCount, fBalance, nDel FROM accounts WHERE aName=?", params);
@@ -58,6 +88,11 @@ int searchaccount(char* cardname){
 } // 
 
 void changeaccount(char* cardname){
+    // 检查卡号格式
+    if(!checkCardNameFormat(cardname)){
+        return;
+    }
+    
     init(); // 初始化表格
     Account acc;
     memset(acc.aPwd, 0, sizeof(acc.aPwd));
@@ -114,7 +149,12 @@ void signup(void){
     cin.width(19);
     cin >> acc.aName;
     cin.ignore(1024,'\n');
-    
+
+    // 检查卡号格式
+    if(!checkCardNameFormat(acc.aName)){
+        return;
+    }
+
     vector<const char*> checkParams = {acc.aName};
     vector<vector<string>> checkResult = accountdb.query("SELECT aName, nDel FROM accounts WHERE aName=?", checkParams);
     
@@ -230,7 +270,45 @@ void signup(void){
 } // 注册
 
 void deletecard(char* cardname){
-    init(); // 初始化表格
+    // 检查卡号格式
+    if(!checkCardNameFormat(cardname)){
+        return;
+    }
+    
+    init();
+
+    // 先查询账户信息
+    vector<const char*> checkParams = {cardname};
+    vector<vector<string>> checkResult = accountdb.query(
+        "SELECT aName, fBalance, nDel FROM accounts WHERE aName=?", checkParams);
+    
+    if(checkResult.empty()){
+        cout << "账户不存在！" << endl;
+        return;
+    }
+    
+    // 检查是否已删除
+    if(checkResult[0][2] == "1"){
+        cout << "该账户已注销！" << endl;
+        return;
+    }
+    
+    // 显示账户信息并确认
+    cout << "账户信息：" << endl;
+    cout << "  卡号：" << checkResult[0][0] << endl;
+    cout << "  余额：" << checkResult[0][1] << " 元" << endl;
+    cout << "确定要注销该账户吗？(y/n)：";
+    
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+    
+    if(choice != 'y' && choice != 'Y'){
+        cout << "已取消注销" << endl;
+        return;
+    }
+    
+    // 执行注销
     time_t tEnd = time(nullptr);
     int nDel = 1;
     int nStatus = 2;

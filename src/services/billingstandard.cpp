@@ -15,33 +15,41 @@ void deletestandard(void);// 删除计费标准
 void billingmenu(){
     char ch;
     while (true) {
-        cout << "\n--------计费标准设置目录--------" << endl;
-        cout << "1. 新增标准\n2. 查询标准\n3. 修改标准\n4. 删除标准\n0. 返回主菜单\n" << endl;
-        cout << "输入数字指令以继续：";
+        cout << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "     计费标准设置目录" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "  1. 新增标准" << endl;
+        cout << "  2. 查询标准" << endl;
+        cout << "  3. 修改标准" << endl;
+        cout << "  4. 删除标准" << endl;
+        cout << "  0. 返回主菜单" << endl;
+        cout << "-----------------------------------" << endl;
+        cout << "请输入选项：";
         cin >> ch;
         cin.ignore(1024, '\n');
         switch (ch) {
             case '0':
-                cout << "正在返回主菜单\n" << endl;
+                cout << "\n正在返回主菜单..." << endl;
                 return;
             case '1':
-                cout << "新增计费标准\n" << endl;
+                cout << "\n>> 新增标准" << endl;
                 newstandard();
                 break;
             case '2':
-                cout << "查询计费标准\n" << endl;
+                cout << "\n>> 查询标准" << endl;
                 searchstandard();
                 break;
             case '3':
-                cout << "修改计费标准\n" << endl;
+                cout << "\n>> 修改标准" << endl;
                 changestandard();
                 break;
             case '4':
-                cout << "删除计费标准\n" << endl;
+                cout << "\n>> 删除标准" << endl;
                 deletestandard();
                 break;
             default:
-                cout << "输入指令不正确，请重新输入\n" << endl;
+                cout << "\n输入指令不正确，请重新输入" << endl;
         }
     }
 }
