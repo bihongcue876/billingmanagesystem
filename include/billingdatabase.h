@@ -17,6 +17,6 @@ bool changestnd(const std::string& id);
 
 bool deletestnd(const std::string& id);
 
-Billing queryToBilling(const std::vector<std::vector<std::string>>& result, int index); // 询问转记录结构体
+Billing queryToBilling(const std::vector<std::vector<std::string>>& result, int index); // 查询转记录结构体
 
 #endif

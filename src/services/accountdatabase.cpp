@@ -92,52 +92,82 @@ void changeaccount(char* cardname){
     if(!checkCardNameFormat(cardname)){
         return;
     }
-    
+
     init(); // 初始化表格
-    Account acc;
-    memset(acc.aPwd, 0, sizeof(acc.aPwd));
-    cout<<"请选择需要修改的部分：\n1.密码\n2.状态"<<endl;
-    cout<<"输入数字标号：";
+    
+    // 先查询账户信息
+    vector<const char*> checkParams = {cardname};
+    vector<vector<string>> checkResult = accountdb.query(
+        "SELECT aName, aPwd, nStatus, fBalance, nDel FROM accounts WHERE aName=?", checkParams);
+    
+    if(checkResult.empty()){
+        cout << "账户不存在！" << endl;
+        return;
+    }
+    
+    // 检查是否已删除
+    if(checkResult[0][4] == "1"){
+        cout << "该账户已注销！" << endl;
+        return;
+    }
+    
+    cout << "请选择需要修改的部分：\n1.密码\n2.状态" << endl;
+    cout << "输入数字标号：";
     int cmd;
-    cin>>cmd;
-    cin.ignore(1024,'\n');
+    cin >> cmd;
+    cin.ignore(1024, '\n');
+    
     switch(cmd){
         case 1:
             {
-            cout<<"输入新密码：";
-            int pwdIndex = 0;
-            char ch;
-            while ((ch = _getch()) != '\r') {
-                if (ch == '\b') {
-                    if (pwdIndex > 0) {
-                        pwdIndex--;
-                        cout << "\b \b";
+                cout << "输入新密码：";
+                char newPwd[9] = {0};
+                int pwdIndex = 0;
+                char ch;
+                while ((ch = _getch()) != '\r') {
+                    if (ch == '\b') {
+                        if (pwdIndex > 0) {
+                            pwdIndex--;
+                            cout << "\b \b";
+                        }
+                    } else if (pwdIndex < 8) {
+                        newPwd[pwdIndex] = ch;
+                        cout << '*';
+                        pwdIndex++;
                     }
-                } else if (pwdIndex < 8) {
-                    acc.aPwd[pwdIndex] = ch;
-                    cout << '*';
-                    pwdIndex++;
+                }
+                newPwd[pwdIndex] = '\0';
+                cout << endl;
+                
+                // 只更新密码
+                vector<const char*> params = {newPwd, cardname};
+                if(accountdb.update("accounts", "aPwd=?", "aName=?", params)){
+                    cout << "密码修改成功！" << endl;
+                } else {
+                    cout << "修改失败：" << accountdb.getLastError() << endl;
                 }
             }
-            acc.aPwd[pwdIndex] = '\0';
-            cout << endl;
             break;
-            }
         case 2:
-            cout<<"修改卡号状态（0-未上机，1-上机中，2-已注销，3-失效）：";
-            cin>>acc.nStatus[0];
-            cin.ignore(1024,'\n');
-            acc.nStatus[1]='\0';
+            {
+                char newStatus[2];
+                cout << "修改卡号状态（0-未上机，1-上机中，2-已注销，3-失效）：";
+                cin >> newStatus[0];
+                cin.ignore(1024, '\n');
+                newStatus[1] = '\0';
+                
+                // 只更新状态
+                vector<const char*> params = {newStatus, cardname};
+                if(accountdb.update("accounts", "nStatus=?", "aName=?", params)){
+                    cout << "状态修改成功！" << endl;
+                } else {
+                    cout << "修改失败：" << accountdb.getLastError() << endl;
+                }
+            }
             break;
         default:
-            cout<<"输入指令错误。"<<endl;
+            cout << "输入指令错误。" << endl;
             break;
-    }
-    vector<const char*> params = {acc.nStatus, acc.aPwd, cardname};
-    if(accountdb.update("accounts", "nStatus=?, aPwd=?", "aName=?", params)){
-        cout << "修改成功！" << endl;
-    } else {
-        cout << "修改失败：" << accountdb.getLastError() << endl;
     }
 } // 改动卡务信息
 

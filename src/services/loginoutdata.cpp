@@ -44,7 +44,7 @@ static string getLogTableName(){
     time_t now = time(nullptr);
     struct tm* timeinfo = localtime(&now);
     char tableName[20];
-    sprintf(tableName, "loginout%d", timeinfo->tm_year + 1900);
+    snprintf(tableName, sizeof(tableName), "loginout%d", timeinfo->tm_year + 1900);
     return string(tableName);
 }
 
@@ -328,7 +328,7 @@ static void initLogTable(){
     int year = timeinfo->tm_year + 1900;
 
     char tableName[20];
-    sprintf(tableName, "loginout%d", year);
+    snprintf(tableName, sizeof(tableName), "loginout%d", year);
 
     const char* columnDefs = "id INTEGER PRIMARY KEY AUTOINCREMENT, aCardName TEXT NOT NULL, tStart INTEGER, tEnd INTEGER, fAmount REAL, fBalance REAL, nPackageId INTEGER DEFAULT 0";
     logdb.tablecreate(tableName, columnDefs);

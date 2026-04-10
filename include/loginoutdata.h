@@ -8,6 +8,6 @@
 
 int login(const char* cardname);
 int logout(const char* cardname);
-LogInfo queryToLogInfo(const std::vector<std::vector<std::string>>& result, int index = 0); // 询问转日志结构体
+LogInfo queryToLogInfo(const std::vector<std::vector<std::string>>& result, int index = 0); // 查询转日志结构体
 
 #endif

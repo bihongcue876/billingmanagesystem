@@ -24,7 +24,7 @@ static string getLogTableName(){
     time_t now = time(nullptr);
     struct tm* timeinfo = localtime(&now);
     char tableName[20];
-    sprintf(tableName, "loginout%d", timeinfo->tm_year + 1900);
+    snprintf(tableName, sizeof(tableName), "loginout%d", timeinfo->tm_year + 1900);
     return string(tableName);
 }
 
@@ -246,16 +246,31 @@ void logsByDate(void){
         return;
     }
 
-    extern sqlitedb logdb;
-    string tableName = getLogTableName();
-
-    // 将日期字符串转换为时间戳（简化处理）
-    // 格式：YYYY-MM-DD
+    // 验证日期格式
     int startYear, startMonth, startDay;
     int endYear, endMonth, endDay;
-    
-    sscanf(startDate.c_str(), "%d-%d-%d", &startYear, &startMonth, &startDay);
-    sscanf(endDate.c_str(), "%d-%d-%d", &endYear, &endMonth, &endDay);
+
+    if(sscanf(startDate.c_str(), "%d-%d-%d", &startYear, &startMonth, &startDay) != 3){
+        cout << "开始日期格式错误！正确格式：YYYY-MM-DD" << endl;
+        return;
+    }
+    if(sscanf(endDate.c_str(), "%d-%d-%d", &endYear, &endMonth, &endDay) != 3){
+        cout << "结束日期格式错误！正确格式：YYYY-MM-DD" << endl;
+        return;
+    }
+
+    // 验证日期合法性
+    if(startYear < 2000 || startYear > 2100 || startMonth < 1 || startMonth > 12 || startDay < 1 || startDay > 31){
+        cout << "开始日期不合法！" << endl;
+        return;
+    }
+    if(endYear < 2000 || endYear > 2100 || endMonth < 1 || endMonth > 12 || endDay < 1 || endDay > 31){
+        cout << "结束日期不合法！" << endl;
+        return;
+    }
+
+    extern sqlitedb logdb;
+    string tableName = getLogTableName();
 
     struct tm startTime = {};
     struct tm endTime = {};
@@ -276,8 +291,18 @@ void logsByDate(void){
     time_t startTimestamp = mktime(&startTime);
     time_t endTimestamp = mktime(&endTime);
 
+    if(startTimestamp == -1 || endTimestamp == -1){
+        cout << "日期转换失败！" << endl;
+        return;
+    }
+
+    if(startTimestamp > endTimestamp){
+        cout << "开始日期不能晚于结束日期！" << endl;
+        return;
+    }
+
     // 查询指定日期范围的日志记录
-    string sql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance, nPackageId FROM " + 
+    string sql = "SELECT id, aCardName, tStart, tEnd, fAmount, fBalance, nPackageId FROM " +
                  tableName + " WHERE tStart >= ? AND tStart <= ? AND tEnd != -1 ORDER BY tStart DESC";
 
     string startStr = to_string(startTimestamp);

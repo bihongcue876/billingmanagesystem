@@ -62,6 +62,11 @@ void newstandard(void){
     cin >> billing.sPackageId;
     cin.ignore(1024, '\n');
 
+    if(billing.sPackageId.empty()){
+        cout << "套餐编号不能为空！" << endl;
+        return;
+    }
+
     vector<const char*> params = {billing.sPackageId.c_str()};
     vector<vector<string>> result = billingdb.query("SELECT sPackageId FROM billings WHERE sPackageId=?", params);
     if(!result.empty()){
@@ -69,15 +74,45 @@ void newstandard(void){
         return;
     }
 
-    cout << "请选择计费单位（0-分钟，1-小时）：";
-    int unitChoice;
-    cin >> unitChoice;
-    cin.ignore(1024, '\n');
-    billing.nUnitType = static_cast<UnitType>(unitChoice);
+    // 计费单位选择，带输入验证
+    while(true){
+        cout << "请选择计费单位（0-分钟，1-小时）：";
+        int unitChoice;
+        cin >> unitChoice;
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(1024, '\n');
+            cout << "输入格式错误，请重新输入！" << endl;
+            continue;
+        }
+        cin.ignore(1024, '\n');
+        if(unitChoice != 0 && unitChoice != 1){
+            cout << "无效选项，请输入 0 或 1！" << endl;
+            continue;
+        }
+        billing.nUnitType = static_cast<UnitType>(unitChoice);
+        break;
+    }
 
-    cout << "请输入单价（元）：";
-    cin >> billing.fUnitPrice;
-    cin.ignore(1024, '\n');
+    // 单价输入，带输入验证
+    while(true){
+        cout << "请输入单价（元）：";
+        float price;
+        cin >> price;
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(1024, '\n');
+            cout << "输入格式错误，请重新输入！" << endl;
+            continue;
+        }
+        cin.ignore(1024, '\n');
+        if(price < 0){
+            cout << "单价不能为负数！" << endl;
+            continue;
+        }
+        billing.fUnitPrice = price;
+        break;
+    }
 
     billing.nDel = 0;
 
@@ -153,18 +188,54 @@ void changestandard(void){
     cout << "输入数字标号：";
     int cmd;
     cin >> cmd;
+    if(cin.fail()){
+        cin.clear();
+        cin.ignore(1024, '\n');
+        cout << "输入指令错误。" << endl;
+        return;
+    }
     cin.ignore(1024, '\n');
 
     if(cmd == 1){
-        cout << "请选择新的计费单位（0-分钟，1-小时）：";
-        int unitChoice;
-        cin >> unitChoice;
-        cin.ignore(1024, '\n');
-        billing.nUnitType = static_cast<UnitType>(unitChoice);
+        // 计费单位选择，带输入验证
+        while(true){
+            cout << "请选择新的计费单位（0-分钟，1-小时）：";
+            int unitChoice;
+            cin >> unitChoice;
+            if(cin.fail()){
+                cin.clear();
+                cin.ignore(1024, '\n');
+                cout << "输入格式错误，请重新输入！" << endl;
+                continue;
+            }
+            cin.ignore(1024, '\n');
+            if(unitChoice != 0 && unitChoice != 1){
+                cout << "无效选项，请输入 0 或 1！" << endl;
+                continue;
+            }
+            billing.nUnitType = static_cast<UnitType>(unitChoice);
+            break;
+        }
     } else if(cmd == 2){
-        cout << "请输入新的单价（元）：";
-        cin >> billing.fUnitPrice;
-        cin.ignore(1024, '\n');
+        // 单价输入，带输入验证
+        while(true){
+            cout << "请输入新的单价（元）：";
+            float price;
+            cin >> price;
+            if(cin.fail()){
+                cin.clear();
+                cin.ignore(1024, '\n');
+                cout << "输入格式错误，请重新输入！" << endl;
+                continue;
+            }
+            cin.ignore(1024, '\n');
+            if(price < 0){
+                cout << "单价不能为负数！" << endl;
+                continue;
+            }
+            billing.fUnitPrice = price;
+            break;
+        }
     } else {
         cout << "输入指令错误。" << endl;
         return;

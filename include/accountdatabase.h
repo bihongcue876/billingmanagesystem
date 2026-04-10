@@ -1,7 +1,7 @@
-#include <iostream>
 #ifndef ACCOUNTDATABASE_H
 #define ACCOUNTDATABASE_H
 
+#include <iostream>
 #include "database.h"
 
 extern sqlitedb accountdb;
