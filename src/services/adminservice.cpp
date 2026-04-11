@@ -1,36 +1,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <conio.h>
 #include "adminservice.h"
 #include "database.h"
+#include "utils.hpp"
 
 using namespace std;
 
 extern string g_currentAdmin;
-
-// 密码隐藏输入
-static string readPassword(const string& prompt){
-    cout << prompt;
-    int pwdIndex = 0;
-    char ch;
-    char inputPwd[20] = {0};
-    while ((ch = _getch()) != '\r') {
-        if (ch == '\b') {
-            if (pwdIndex > 0) {
-                pwdIndex--;
-                cout << "\b \b";
-            }
-        } else if (pwdIndex < 19) {
-            inputPwd[pwdIndex] = ch;
-            cout << '*';
-            pwdIndex++;
-        }
-    }
-    inputPwd[pwdIndex] = '\0';
-    cout << endl;
-    return string(inputPwd);
-}
 
 // 验证当前管理员密码
 static bool verifyCurrentPassword(const string& username, const string& password){
@@ -45,21 +22,21 @@ static bool verifyCurrentPassword(const string& username, const string& password
 void changePassword(const string& currentAdmin){
     cout << "=== 修改密码 ===" << endl;
 
-    string oldPwd = readPassword("请输入当前密码：");
+    string oldPwd = readPassword("请输入当前密码：", 12);
     
     if(!verifyCurrentPassword(currentAdmin, oldPwd)){
         cout << "当前密码错误！" << endl;
         return;
     }
 
-    string newPwd = readPassword("请输入新密码（6-12 位）：");
+    string newPwd = readPassword("请输入新密码（6-12 位）：", 12);
     
     if(newPwd.length() < 6 || newPwd.length() > 12){
         cout << "密码长度必须在 6-12 位之间！" << endl;
         return;
     }
 
-    string confirmPwd = readPassword("请确认新密码：");
+    string confirmPwd = readPassword("请确认新密码：", 12);
     
     if(newPwd != confirmPwd){
         cout << "两次输入的密码不一致！" << endl;
@@ -97,14 +74,14 @@ void addAdmin(const string& currentAdmin){
         return;
     }
 
-    string password = readPassword("请输入密码（6-12 位）：");
+    string password = readPassword("请输入密码（6-12 位）：", 12);
     
     if(password.length() < 6 || password.length() > 12){
         cout << "密码长度必须在 6-12 位之间！" << endl;
         return;
     }
 
-    string confirmPwd = readPassword("请确认密码：");
+    string confirmPwd = readPassword("请确认密码：", 12);
     
     if(password != confirmPwd){
         cout << "两次输入的密码不一致！" << endl;

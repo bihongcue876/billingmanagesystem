@@ -2,12 +2,12 @@
 #include <ctime>
 #include <string>
 #include <cmath>
-#include <conio.h>
 #include "loginoutdata.h"
 #include "database.h"
 #include "model.hpp"
 #include "accountdatabase.h"
 #include "billingdatabase.h"
+#include "utils.hpp"
 #include "financedatabase.h"
 
 using namespace std;
@@ -80,26 +80,9 @@ int login(const char* cardname){
     // 密码验证：允许输入五次
     bool pwdCorrect = false;
     for(int attempt = 1; attempt <= 5; attempt++){
-        cout << "请输入密码：";
-        char inputPwd[9];
-        int pwdIndex = 0;
-        char ch;
-        while ((ch = _getch()) != '\r') {
-            if (ch == '\b') {
-                if (pwdIndex > 0) {
-                    pwdIndex--;
-                    cout << "\b \b";
-                }
-            } else if (pwdIndex < 8) {
-                inputPwd[pwdIndex] = ch;
-                cout << '*';
-                pwdIndex++;
-            }
-        }
-        inputPwd[pwdIndex] = '\0';
-        cout << endl;
+        string inputPwd = readPassword("请输入密码：", 8);
 
-        if(strcmp(inputPwd, acc.aPwd) == 0){
+        if(strcmp(inputPwd.c_str(), acc.aPwd) == 0){
             pwdCorrect = true;
             break;
         } else {

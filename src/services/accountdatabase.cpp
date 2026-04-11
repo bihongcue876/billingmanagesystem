@@ -2,7 +2,6 @@
 #include <ctime>
 #include <string>
 #include <vector>
-#include <conio.h>
 #include <cstring>
 #include "sqlite3.h"
 #include "accountdatabase.h"
@@ -120,27 +119,10 @@ void changeaccount(char* cardname){
     switch(cmd){
         case 1:
             {
-                cout << "输入新密码：";
-                char newPwd[9] = {0};
-                int pwdIndex = 0;
-                char ch;
-                while ((ch = _getch()) != '\r') {
-                    if (ch == '\b') {
-                        if (pwdIndex > 0) {
-                            pwdIndex--;
-                            cout << "\b \b";
-                        }
-                    } else if (pwdIndex < 8) {
-                        newPwd[pwdIndex] = ch;
-                        cout << '*';
-                        pwdIndex++;
-                    }
-                }
-                newPwd[pwdIndex] = '\0';
-                cout << endl;
-                
+                string newPwd = readPassword("输入新密码：", 8);
+
                 // 只更新密码
-                vector<const char*> params = {newPwd, cardname};
+                vector<const char*> params = {newPwd.c_str(), cardname};
                 if(accountdb.update("accounts", "aPwd=?", "aName=?", params)){
                     cout << "密码修改成功！" << endl;
                 } else {
@@ -200,24 +182,11 @@ void signup(void){
             cout << "检测到已注销账号，将重新启用并初始化..." << endl;
         }
     }
+
+    string pwd = readPassword("请输入密码（最多8位）：", 8);
+    strncpy(acc.aPwd, pwd.c_str(), sizeof(acc.aPwd) - 1);
+    acc.aPwd[sizeof(acc.aPwd) - 1] = '\0';
     
-    cout << "请输入密码（最多8位）：";
-    int pwdIndex = 0;
-    char ch;
-    while ((ch = _getch()) != '\r') {
-        if (ch == '\b') {
-            if (pwdIndex > 0) {
-                pwdIndex--;
-                cout << "\b \b";
-            }
-        } else if (pwdIndex < 8) {
-            acc.aPwd[pwdIndex] = ch;
-            cout << '*';
-            pwdIndex++;
-        }
-    }
-    acc.aPwd[pwdIndex] = '\0';
-    cout << endl;
     acc.tStart = time(nullptr);
     acc.tEnd = acc.tStart + 365 * 24 * 60 * 60;
     acc.fTotalUse = 0.0f;

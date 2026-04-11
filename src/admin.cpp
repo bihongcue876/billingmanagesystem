@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <conio.h>
 #include "admin.h"
 #include "database.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -52,28 +52,10 @@ int admin(){
         getline(cin, username);
         
         cout << "请输入密码：";
-        
+
         // 密码隐藏输入
-        char inputPwd[20];
-        int pwdIndex = 0;
-        char ch;
-        while ((ch = _getch()) != '\r') {
-            if (ch == '\b') {
-                if (pwdIndex > 0) {
-                    pwdIndex--;
-                    cout << "\b \b";
-                }
-            } else if (pwdIndex < 19) {
-                inputPwd[pwdIndex] = ch;
-                cout << '*';
-                pwdIndex++;
-            }
-        }
-        inputPwd[pwdIndex] = '\0';
-        cout << endl;
-        
-        password = inputPwd;
-        
+        password = readPassword("请输入密码：", 19);
+
         if(verifyAdmin(username, password)){
             cout << "登录成功！" << endl;
             g_currentAdmin = username;  // 保存当前登录管理员
