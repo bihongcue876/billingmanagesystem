@@ -283,9 +283,14 @@ inline char showMenu(
 
 #include <fstream>
 #include <cstdlib>
+#include <windows.h>
 
 inline bool ensureDirectory(const std::string& path) {
-    std::string cmd = "mkdir -p " + path;
+    DWORD dwAttrib = GetFileAttributesA(path.c_str());
+    if(dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)){
+        return true;
+    }
+    std::string cmd = "mkdir " + path;
     return system(cmd.c_str()) == 0;
 }
 
