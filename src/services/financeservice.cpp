@@ -1,10 +1,13 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
+#include <cmath>
 #include "database.h"
 #include "model.hpp"
 #include "financeservice.h"
 #include "financedatabase.h"
 #include "accountdatabase.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -109,7 +112,7 @@ void topup(void){
 
     // 大额充值确认（超过 500 元）
     if(amount > 500){
-        cout << "警告：充值金额较大（" << amount << " 元），确定继续吗？(y/n)：";
+        cout << "警告：充值金额较大（" << formatCurrency(amount) << " 元），确定继续吗？(y/n)：";
         char choice;
         cin >> choice;
         cin.ignore(1024, '\n');
@@ -119,7 +122,7 @@ void topup(void){
         }
     }
 
-    float newBalance = balanceBefore + amount;
+    float newBalance = round((balanceBefore + amount) * 100.0f) / 100.0f;
     
     // 更新账户余额
     string balanceStr = to_string(newBalance);
@@ -131,7 +134,7 @@ void topup(void){
     
     // 记录财务交易
     if(insertTransaction(cardId, 1, amount, balanceBefore, newBalance, "账户充值")){
-        cout << "充值成功！当前余额：" << newBalance << "元" << endl;
+        cout << "充值成功！当前余额：" << formatCurrency(newBalance) << "元" << endl;
     } else {
         cout << "充值成功，但记录交易失败！" << endl;
     }
@@ -184,13 +187,13 @@ void refund(void){
     }
 
     if(amount > balanceBefore){
-        cout << "退费金额不能超过当前余额（" << balanceBefore << "元）！" << endl;
+        cout << "退费金额不能超过当前余额（" << formatCurrency(balanceBefore) << "元）！" << endl;
         return;
     }
 
     // 大额退费确认（超过 500 元）
     if(amount > 500){
-        cout << "警告：退费金额较大（" << amount << " 元），确定继续吗？(y/n)：";
+        cout << "警告：退费金额较大（" << formatCurrency(amount) << " 元），确定继续吗？(y/n)：";
         char choice;
         cin >> choice;
         cin.ignore(1024, '\n');
@@ -200,7 +203,7 @@ void refund(void){
         }
     }
 
-    float newBalance = balanceBefore - amount;
+    float newBalance = round((balanceBefore - amount) * 100.0f) / 100.0f;
     
     // 更新账户余额
     string balanceStr = to_string(newBalance);
@@ -212,7 +215,7 @@ void refund(void){
     
     // 记录财务交易
     if(insertTransaction(cardId, 2, amount, balanceBefore, newBalance, "账户退费")){
-        cout << "退费成功！当前余额：" << newBalance << "元" << endl;
+        cout << "退费成功！当前余额：" << formatCurrency(newBalance) << "元" << endl;
     } else {
         cout << "退费成功，但记录交易失败！" << endl;
     }
@@ -259,10 +262,10 @@ void statistics(void){
     float totalConsumption = sumAmountByType(3); // 消费总额
     
     cout << "--------营业额统计--------" << endl;
-    cout << "充值总额：" << totalTopup << " 元" << endl;
-    cout << "退费总额：" << totalRefund << " 元" << endl;
-    cout << "消费总额：" << totalConsumption << " 元" << endl;
-    cout << "净营业额：" << (totalTopup - totalRefund) << " 元" << endl;
+    cout << "充值总额：" << formatCurrency(totalTopup) << " 元" << endl;
+    cout << "退费总额：" << formatCurrency(totalRefund) << " 元" << endl;
+    cout << "消费总额：" << formatCurrency(totalConsumption) << " 元" << endl;
+    cout << "净营业额：" << formatCurrency(totalTopup - totalRefund) << " 元" << endl;
 }// 统计
 
 void historyByDate(void){

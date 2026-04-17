@@ -2,6 +2,8 @@
 #define UTILS_HPP
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <limits>
 #include <string>
 #include <conio.h>
@@ -244,6 +246,17 @@ inline char readOption(const std::string& prompt = "输入数字指令以继续�
     std::cin >> ch;
     std::cin.ignore(1024, '\n');
     return ch;
+}
+
+/**
+ * @brief 格式化金额显示（保留两位小数）
+ * @param amount 金额
+ * @return 格式化后的字符串
+ */
+inline std::string formatCurrency(float amount) {
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2) << amount;
+    return oss.str();
 }
 
 /**

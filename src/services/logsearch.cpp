@@ -8,6 +8,7 @@
 #include "loginoutdata.h"
 #include "database.h"
 #include "model.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -112,10 +113,10 @@ void totalsales(void){
     
     cout << "------------------------------------------------------------------------" << endl;
     cout << "\n=== 统计汇总 ===" << endl;
-    cout << "充值总额：" << totalRecharge << " 元" << endl;
-    cout << "退费总额：" << totalRefund << " 元" << endl;
-    cout << "消费总额：" << totalConsumption << " 元" << endl;
-    cout << "实际营收：" << (totalRecharge - totalRefund) << " 元" << endl;
+    cout << "充值总额：" << formatCurrency(totalRecharge) << " 元" << endl;
+    cout << "退费总额：" << formatCurrency(totalRefund) << " 元" << endl;
+    cout << "消费总额：" << formatCurrency(totalConsumption) << " 元" << endl;
+    cout << "实际营收：" << formatCurrency(totalRecharge - totalRefund) << " 元" << endl;
 }
 
 // 上下机日志 - 显示所有上下机记录
@@ -219,7 +220,7 @@ void logprint(void){
     }
     
     cout << "--------------------------------------------------------------------------------" << endl;
-    cout << "共计 " << count << " 条记录，总消费：" << totalAmount << " 元" << endl;
+    cout << "共计 " << count << " 条记录，总消费：" << formatCurrency(totalAmount) << " 元" << endl;
 
     // 询问是否打印（模拟）
     cout << "\n是否打印以上记录？(y/n)：";
@@ -345,5 +346,5 @@ void logsByDate(void){
     }
 
     cout << "--------------------------------------------------------------------------------" << endl;
-    cout << "共计 " << count << " 条记录，总消费：" << totalAmount << " 元" << endl;
+    cout << "共计 " << count << " 条记录，总消费：" << formatCurrency(totalAmount) << " 元" << endl;
 }

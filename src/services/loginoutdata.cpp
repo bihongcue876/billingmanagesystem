@@ -122,7 +122,7 @@ int login(const char* cardname){
         for(size_t i = 0; i < billingResult.size(); i++){
             Billing billing = queryToBilling(billingResult, i);
             string unitTypeStr = (billing.nUnitType == UnitType::MINUTE) ? "分钟" : "小时";
-            cout << billing.sPackageId << "\t" << unitTypeStr << "\t" << billing.fUnitPrice << "元" << endl;
+            cout << billing.sPackageId << "\t" << unitTypeStr << "\t" << formatCurrency(billing.fUnitPrice) << "元" << endl;
         }
 
         while(true){
@@ -240,7 +240,7 @@ int logout(const char* cardname){
     }
 
     float fAmount = calculateFee(log.tStart, now, fUnitPrice, nUnitType);
-    float fNewBalance = acc.fBalance - fAmount;
+    float fNewBalance = round((acc.fBalance - fAmount) * 100.0f) / 100.0f;
 
     // 更新上机日志记录
     string tEndStr = to_string(now);

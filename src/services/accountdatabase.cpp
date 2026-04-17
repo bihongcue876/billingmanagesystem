@@ -292,37 +292,129 @@ void deletecard(char* cardname){
         return;
     }
     
-    // 显示账户信息并确认
+    // 获取余额
+    float balance = stof(checkResult[0][1]);
+    
+    // 显示账户信息
     cout << "账户信息：" << endl;
     cout << "  卡号：" << checkResult[0][0] << endl;
-    cout << "  余额：" << checkResult[0][1] << " 元" << endl;
-    cout << "确定要注销该账户吗？(y/n)：";
+    cout << "  余额：" << formatCurrency(balance) << " 元" << endl;
     
-    char choice;
-    cin >> choice;
-    cin.ignore(1024, '\n');
+    // 检查余额状态
+    const float DEBT_THRESHOLD = -100.0f;  // 欠费阈值，超过此值可能是系统错误
     
-    if(choice != 'y' && choice != 'Y'){
+    if(balance > 0){
+        // 有余额，需要先退费
+        cout << "提示：该账户还有余额，请先进行退费操作后再注销！" << endl;
+        cout << "（如需强制注销并退还余额，请输入 y 确认）" << endl;
+        cout << "确定要注销该账户吗？(y/n)：";
+        
+        char choice;
+        cin >> choice;
+        cin.ignore(1024, '\n');
+        
+        if(choice != 'y' && choice != 'Y'){
+            cout << "已取消注销" << endl;
+            return;
+        }
+        
+        // 执行注销并退还余额
+        time_t tEnd = time(nullptr);
+        int nDel = 1;
+        int nStatus = 2;
+        string statusStr = to_string(nStatus);
+        string tEndStr   = to_string(tEnd);
+        string delStr    = to_string(nDel);
+        string zeroBalanceStr = "0";
+        
+        vector<const char*> params = {
+            statusStr.c_str(),
+            tEndStr.c_str(),
+            delStr.c_str(),
+            zeroBalanceStr.c_str(),
+            cardname
+        };
+        
+        if(accountdb.update("accounts", "nStatus=?, tEnd=?, nDel=?, fBalance=?", "aName=?", params)){
+            insertTransaction(cardname, 2, balance, balance, 0.0f, "账户注销退费");
+            cout << "已退还余额：" << formatCurrency(balance) << " 元" << endl;
+            cout << "注销成功！" << endl;
+        } else {
+            cout << "注销失败：" << accountdb.getLastError() << endl;
+        }
+        
+    } else if(balance < 0 && balance >= DEBT_THRESHOLD){
+        // 欠费但未超过阈值，需要先还债
+        cout << "提示：该账户欠费 " << formatCurrency(-balance) << " 元，请先还清欠款后再注销！" << endl;
         cout << "已取消注销" << endl;
-        return;
-    }
-    
-    // 执行注销
-    time_t tEnd = time(nullptr);
-    int nDel = 1;
-    int nStatus = 2;
-    string statusStr = to_string(nStatus);
-    string tEndStr   = to_string(tEnd);
-    string delStr    = to_string(nDel);
-    vector<const char*> params = {
-        statusStr.c_str(),
-        tEndStr.c_str(),
-        delStr.c_str(),
-        cardname
-    };
-    if(accountdb.update("accounts", "nStatus=?, tEnd=?, nDel=?", "aName=?", params)){
-        cout << "注销成功！" << endl;
+        
+    } else if(balance < DEBT_THRESHOLD){
+        // 欠费过多，可能是系统错误，允许直接删除
+        cout << "警告：该账户欠费严重（" << formatCurrency(balance) << " 元），可能是系统错误。" << endl;
+        cout << "确定要强制注销该账户吗？(y/n)：";
+        
+        char choice;
+        cin >> choice;
+        cin.ignore(1024, '\n');
+        
+        if(choice != 'y' && choice != 'Y'){
+            cout << "已取消注销" << endl;
+            return;
+        }
+        
+        // 执行注销
+        time_t tEnd = time(nullptr);
+        int nDel = 1;
+        int nStatus = 2;
+        string statusStr = to_string(nStatus);
+        string tEndStr   = to_string(tEnd);
+        string delStr    = to_string(nDel);
+        
+        vector<const char*> params = {
+            statusStr.c_str(),
+            tEndStr.c_str(),
+            delStr.c_str(),
+            cardname
+        };
+        
+        if(accountdb.update("accounts", "nStatus=?, tEnd=?, nDel=?", "aName=?", params)){
+            cout << "强制注销成功！（不退还余额）" << endl;
+        } else {
+            cout << "注销失败：" << accountdb.getLastError() << endl;
+        }
+        
     } else {
-        cout << "注销失败：" << accountdb.getLastError() << endl;
+        // 余额为0，可以直接注销
+        cout << "确定要注销该账户吗？(y/n)：";
+        
+        char choice;
+        cin >> choice;
+        cin.ignore(1024, '\n');
+        
+        if(choice != 'y' && choice != 'Y'){
+            cout << "已取消注销" << endl;
+            return;
+        }
+        
+        // 执行注销
+        time_t tEnd = time(nullptr);
+        int nDel = 1;
+        int nStatus = 2;
+        string statusStr = to_string(nStatus);
+        string tEndStr   = to_string(tEnd);
+        string delStr    = to_string(nDel);
+        
+        vector<const char*> params = {
+            statusStr.c_str(),
+            tEndStr.c_str(),
+            delStr.c_str(),
+            cardname
+        };
+        
+        if(accountdb.update("accounts", "nStatus=?, tEnd=?, nDel=?", "aName=?", params)){
+            cout << "注销成功！" << endl;
+        } else {
+            cout << "注销失败：" << accountdb.getLastError() << endl;
+        }
     }
 } // 注销

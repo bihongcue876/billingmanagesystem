@@ -4,6 +4,7 @@
 #include "adminservice.h"
 #include "database.h"
 #include "utils.hpp"
+#include "admin.h"
 
 using namespace std;
 
@@ -140,18 +141,20 @@ void deleteAdmin(){
 void adminList(){
     cout << "=== 管理员列表 ===" << endl;
 
+    initAdminTable();
+    
     sqlitedb admindb(DATA_ROOT"admin.db");
-    vector<vector<string>> result = admindb.query("SELECT id, username, createTime FROM admins ORDER BY id");
+    vector<vector<string>> result = admindb.query("SELECT id, username FROM admins ORDER BY id");
 
     if(result.empty()){
         cout << "暂无管理员" << endl;
         return;
     }
 
-    cout << "ID\t账号\t创建时间" << endl;
+    cout << "ID\t账号" << endl;
     cout << "------------------------" << endl;
     for(size_t i = 0; i < result.size(); i++){
-        cout << result[i][0] << "\t" << result[i][1] << "\t" << result[i][2] << endl;
+        cout << result[i][0] << "\t" << result[i][1] << endl;
     }
     cout << "------------------------" << endl;
     cout << "共计 " << result.size() << " 个管理员账号" << endl;

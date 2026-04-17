@@ -5,6 +5,7 @@
 #include "model.hpp"
 #include "accountservice.h"
 #include "accountdatabase.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -152,5 +153,5 @@ void accountlist(void){
     }
     
     cout << "------------------------------------------------------------" << endl;
-    cout << "共计 " << count << " 个有效账户，总余额：" << totalBalance << " 元" << endl;
+    cout << "共计 " << count << " 个有效账户，总余额：" << formatCurrency(totalBalance) << " 元" << endl;
 }

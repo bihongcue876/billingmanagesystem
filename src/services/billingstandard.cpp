@@ -4,6 +4,7 @@
 #include "model.hpp"
 #include "billingstandard.h"
 #include "billingdatabase.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -182,7 +183,7 @@ void changestandard(void){
     cout << "当前套餐信息：" << endl;
     cout << "套餐编号：" << billing.sPackageId << endl;
     cout << "计费单位：" << (billing.nUnitType == UnitType::MINUTE ? "分钟" : "小时") << endl;
-    cout << "单价：" << billing.fUnitPrice << "元" << endl;
+    cout << "单价：" << formatCurrency(billing.fUnitPrice) << "元" << endl;
 
     cout << "请选择需要修改的部分：\n1. 计费单位\n2. 单价" << endl;
     cout << "输入数字标号：";

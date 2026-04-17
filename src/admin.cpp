@@ -16,9 +16,9 @@ string getCurrentAdmin(){
 }
 
 // 初始化管理员表
-static void initAdminTable(){
+void initAdminTable(){
     sqlitedb admindb(DATA_ROOT"admin.db");
-    admindb.tablecreate("admins", "id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL");
+    admindb.tablecreate("admins", "id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, createTime TEXT");
     
     // 检查是否有管理员，没有则创建默认的
     vector<vector<string>> result = admindb.query("SELECT COUNT(*) FROM admins");
@@ -51,8 +51,6 @@ int admin(){
         cout << "请输入管理员账号：";
         getline(cin, username);
         
-        cout << "请输入密码：";
-
         // 密码隐藏输入
         password = readPassword("请输入密码：", 19);
 
