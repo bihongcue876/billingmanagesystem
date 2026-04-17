@@ -72,7 +72,7 @@ void newstandard(void){
     }
 
     vector<const char*> params = {billing.sPackageId.c_str()};
-    vector<vector<string>> result = billingdb.query("SELECT sPackageId FROM billings WHERE sPackageId=?", params);
+    vector<vector<string>> result = billingdb.query("SELECT sPackageId FROM billings WHERE sPackageId=? AND nDel=0", params);
     if(!result.empty()){
         cout << "套餐编号已存在！" << endl;
         return;

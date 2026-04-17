@@ -144,7 +144,7 @@ int login(const char* cardname){
 
     // 显示可用套餐并让管理员选择
     initbilling();
-    vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice FROM billings WHERE nDel=0");
+    vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount FROM billings WHERE nDel=0");
     string packageId;
 
     if(billingResult.empty()){
@@ -152,11 +152,12 @@ int login(const char* cardname){
         packageId = "0";
     } else {
         cout << "请选择计费套餐：" << endl;
-        cout << "编号\t计费单位\t单价" << endl;
+        cout << "编号\t套餐名称\t\t计费模式\t计费单位\t单价" << endl;
         for(size_t i = 0; i < billingResult.size(); i++){
             Billing billing = queryToBilling(billingResult, i);
             string unitTypeStr = (billing.nUnitType == UnitType::MINUTE) ? "分钟" : "小时";
-            cout << billing.sPackageId << "\t" << unitTypeStr << "\t" << formatCurrency(billing.fUnitPrice) << "元" << endl;
+            string modeStr = (billing.nSegmentCount > 0) ? "分段计费" : "简单计费";
+            cout << billing.sPackageId << "\t" << billing.sPackageName << "\t" << modeStr << "\t" << unitTypeStr << "\t" << formatCurrency(billing.fUnitPrice) << "元" << endl;
         }
 
         while(true){
