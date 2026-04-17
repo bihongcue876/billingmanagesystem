@@ -1,49 +1,14 @@
-# 整个 build 目录（CMake 生成目录）
 build/
-
-# 整个 data 目录（数据库文件）
 data/
+实验报告.md
+data/account.db
+output/
 
-# CMake 生成的文件（根目录）
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-
-# 编译中间产物
-*.o
-*.obj
-*.a
-*.lib
-*.so
-*.dylib
-*.dll
-*.pdb
-*.ilk
-*.exp
-*.manifest
-
-# 编译器临时文件
-*.deps
-*.d
-*.idb
-*.ipdb
-*.iobj
-
-# 可执行文件（输出到项目根目录）
 *.exe
 !app.exe
 *.out
-
-# IDE 文件
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# 系统文件
-.DS_Store
-Thumbs.db
-
-实验报告.md
-data/account.db
