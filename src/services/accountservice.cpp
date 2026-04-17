@@ -1,10 +1,14 @@
 #include <iostream>
 #include <cstring>
 #include <ctime>
+#include <fstream>
+#include <string>
+#include <cstdlib>
 #include "sqlite3.h"
 #include "model.hpp"
 #include "accountservice.h"
 #include "accountdatabase.h"
+#include "database.h"
 #include "utils.hpp"
 
 using namespace std;
@@ -128,6 +132,9 @@ void accountlist(void){
     
     float totalBalance = 0.0f;
     int count = 0;
+    string outputContent;
+    outputContent += "卡号\t\t状态\t余额\t使用次数\t最后使用时间\n";
+    outputContent += "------------------------------------------------------------\n";
     
     for(size_t i = 0; i < result.size(); i++){
         const vector<string>& row = result[i];
@@ -146,7 +153,9 @@ void accountlist(void){
         char timeStr[32];
         strftime(timeStr, sizeof(timeStr), "%Y/%m/%d %H:%M", timeinfo);
         
-        cout << row[0] << "\t" << statusStr << "\t" << balance << "\t" << useCount << "\t\t" << timeStr << endl;
+        string line = row[0] + "\t" + statusStr + "\t" + formatCurrency(balance) + "\t" + to_string(useCount) + "\t\t" + timeStr + "\n";
+        cout << line;
+        outputContent += line;
         
         totalBalance += balance;
         count++;
@@ -154,4 +163,30 @@ void accountlist(void){
     
     cout << "------------------------------------------------------------" << endl;
     cout << "共计 " << count << " 个有效账户，总余额：" << formatCurrency(totalBalance) << " 元" << endl;
+    outputContent += "------------------------------------------------------------\n";
+    outputContent += "共计 " + to_string(count) + " 个有效账户，总余额：" + formatCurrency(totalBalance) + " 元\n";
+    
+    cout << "\n是否导出到文件？(y/n)：";
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+    
+    if(choice == 'y' || choice == 'Y'){
+        time_t now = time(nullptr);
+        struct tm* timeinfo = localtime(&now);
+        char filename[64];
+        strftime(filename, sizeof(filename), "accounts_%Y%m%d_%H%M%S.txt", timeinfo);
+        
+        string outputDir = OUTPUT_ROOT;
+        string filepath = outputDir + filename;
+        if(ensureDirectory(outputDir)){
+            if(saveToFile(filepath, outputContent)){
+                cout << "导出成功！文件保存至：" << filepath << endl;
+            } else {
+                cout << "导出失败！" << endl;
+            }
+        } else {
+            cout << "创建输出目录失败！" << endl;
+        }
+    }
 }

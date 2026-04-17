@@ -47,16 +47,33 @@ typedef struct Account {
 } Account;
 
 /**
+ * @struct BillingSegment
+ * @brief 计费分段结构体
+ * 
+ * 用于分段计费，每段包含时长范围和单价。
+ */
+typedef struct BillingSegment {
+    float fStartHour;       // 开始小时数（如0表示0小时起）
+    float fEndHour;         // 结束小时数（如1表示1小时，-1表示无上限）
+    float fPricePerHour;    // 该段的单价（元/小时）
+} BillingSegment;
+
+#define MAX_SEGMENTS 10
+
+/**
  * @struct Billing
  * @brief 计费规则结构体
  * 
- * 存储计费套餐的详细信息，包括套餐编号、计费单位和单价。
+ * 存储计费套餐的详细信息，包括套餐编号、计费单位和分段计费规则。
  */
 typedef struct Billing {
-    std::string sPackageId;  // 套餐编号，唯一标识
-    UnitType nUnitType;      // 计费单位：MINUTE-分钟，HOUR-小时
-    float fUnitPrice;        // 单价，对应计费单位的费用
-    int nDel;                // 是否失效：0-有效，1-失效
+    std::string sPackageId;      // 套餐编号，唯一标识
+    std::string sPackageName;    // 套餐名称
+    UnitType nUnitType;          // 计费单位：MINUTE-分钟，HOUR-小时
+    float fUnitPrice;            // 单价（用于简单计费模式）
+    int nSegmentCount;           // 分段数量
+    BillingSegment segments[MAX_SEGMENTS]; // 分段计费规则
+    int nDel;                   // 是否失效：0-有效，1-失效
 } Billing;
 
 /**

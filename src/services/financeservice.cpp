@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <string>
 #include <cmath>
+#include <fstream>
+#include <ctime>
 #include "database.h"
 #include "model.hpp"
 #include "financeservice.h"
@@ -241,6 +243,7 @@ void history(void){
     }
     
     cout << "ID\t卡号\t类型\t金额\t备注\t时间" << endl;
+    string outputContent = "ID,卡号,类型,金额,备注,时间\n";
     for(size_t i = 0; i < records.size(); i++){
         string typeStr;
         if(records[i].type == 1) typeStr = "充值";
@@ -248,9 +251,35 @@ void history(void){
         else if(records[i].type == 3) typeStr = "消费";
         else typeStr = "未知";
         
-        cout << records[i].id << "\t" << records[i].cardId << "\t" 
-             << typeStr << "\t" << records[i].amount << "\t" 
-             << records[i].remark << "\t" << records[i].time << endl;
+        string line = to_string(records[i].id) + "\t" + records[i].cardId + "\t" + typeStr + "\t" 
+                   + formatCurrency(records[i].amount) + "\t" + records[i].remark + "\t" + records[i].time + "\n";
+        cout << line;
+        outputContent += to_string(records[i].id) + "," + records[i].cardId + "," + typeStr + "," 
+                      + formatCurrency(records[i].amount) + "," + records[i].remark + "," + records[i].time + "\n";
+    }
+
+    cout << "\n是否导出到文件？(y/n)：";
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+
+    if(choice == 'y' || choice == 'Y'){
+        time_t now = time(nullptr);
+        struct tm* timeinfo = localtime(&now);
+        char filename[64];
+        strftime(filename, sizeof(filename), "consumption_history_%Y%m%d_%H%M%S.csv", timeinfo);
+
+        string outputDir = OUTPUT_ROOT;
+        string filepath = outputDir + filename;
+        if(ensureDirectory(outputDir)){
+            if(saveToFile(filepath, outputContent)){
+                cout << "导出成功！文件保存至：" << filepath << endl;
+            } else {
+                cout << "导出失败！" << endl;
+            }
+        } else {
+            cout << "创建输出目录失败！" << endl;
+        }
     }
 }// 历史
 

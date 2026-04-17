@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <ctime>
+#include <cstdlib>
 #include "database.h"
 #include "model.hpp"
 #include "billingstandard.h"
@@ -75,6 +78,9 @@ void newstandard(void){
         return;
     }
 
+    cout << "请输入套餐名称：";
+    getline(cin, billing.sPackageName);
+
     // 计费单位选择，带输入验证
     while(true){
         cout << "请选择计费单位（0-分钟，1-小时）：";
@@ -95,11 +101,11 @@ void newstandard(void){
         break;
     }
 
-    // 单价输入，带输入验证
+    // 选择计费模式
     while(true){
-        cout << "请输入单价（元）：";
-        float price;
-        cin >> price;
+        cout << "请选择计费模式（1-简单计费，2-分段计费）：";
+        int modeChoice;
+        cin >> modeChoice;
         if(cin.fail()){
             cin.clear();
             cin.ignore(1024, '\n');
@@ -107,11 +113,139 @@ void newstandard(void){
             continue;
         }
         cin.ignore(1024, '\n');
-        if(price < 0){
-            cout << "单价不能为负数！" << endl;
+        if(modeChoice != 1 && modeChoice != 2){
+            cout << "无效选项，请输入 1 或 2！" << endl;
             continue;
         }
-        billing.fUnitPrice = price;
+        
+        if(modeChoice == 1) {
+            billing.nSegmentCount = 0;
+            while(true){
+                cout << "请输入单价（元）：";
+                float price;
+                cin >> price;
+                if(cin.fail()){
+                    cin.clear();
+                    cin.ignore(1024, '\n');
+                    cout << "输入格式错误，请重新输入！" << endl;
+                    continue;
+                }
+                cin.ignore(1024, '\n');
+                if(price < 0){
+                    cout << "单价不能为负数！" << endl;
+                    continue;
+                }
+                billing.fUnitPrice = price;
+                break;
+            }
+        } else {
+            billing.fUnitPrice = 0;
+            while(true){
+                cout << "请输入分段数量（1-" << MAX_SEGMENTS << "）：";
+                int segCount;
+                cin >> segCount;
+                if(cin.fail()){
+                    cin.clear();
+                    cin.ignore(1024, '\n');
+                    cout << "输入格式错误，请重新输入！" << endl;
+                    continue;
+                }
+                cin.ignore(1024, '\n');
+                if(segCount < 1 || segCount > MAX_SEGMENTS){
+                    cout << "分段数量无效！" << endl;
+                    continue;
+                }
+                billing.nSegmentCount = segCount;
+                break;
+            }
+            
+            string segmentsStr = "";
+            for(int i = 0; i < billing.nSegmentCount; i++){
+                BillingSegment seg;
+                cout << "\n--- 第 " << (i+1) << " 段 ---" << endl;
+                
+                while(true){
+                    cout << "开始时间（小时，如0表示0小时起）：";
+                    cin >> seg.fStartHour;
+                    if(cin.fail()){
+                        cin.clear();
+                        cin.ignore(1024, '\n');
+                        cout << "输入格式错误！" << endl;
+                        continue;
+                    }
+                    cin.ignore(1024, '\n');
+                    if(seg.fStartHour < 0){
+                        cout << "开始时间不能为负数！" << endl;
+                        continue;
+                    }
+                    break;
+                }
+                
+                while(true){
+                    cout << "结束时间（小时，-1表示无上限）：";
+                    cin >> seg.fEndHour;
+                    if(cin.fail()){
+                        cin.clear();
+                        cin.ignore(1024, '\n');
+                        cout << "输入格式错误！" << endl;
+                        continue;
+                    }
+                    cin.ignore(1024, '\n');
+                    if(seg.fEndHour != -1 && seg.fEndHour <= seg.fStartHour){
+                        cout << "结束时间必须大于开始时间！" << endl;
+                        continue;
+                    }
+                    break;
+                }
+                
+                while(true){
+                    cout << "该段单价（元/小时）：";
+                    cin >> seg.fPricePerHour;
+                    if(cin.fail()){
+                        cin.clear();
+                        cin.ignore(1024, '\n');
+                        cout << "输入格式错误！" << endl;
+                        continue;
+                    }
+                    cin.ignore(1024, '\n');
+                    if(seg.fPricePerHour < 0){
+                        cout << "单价不能为负数！" << endl;
+                        continue;
+                    }
+                    break;
+                }
+                
+                billing.segments[i] = seg;
+                
+                if(i > 0){
+                    segmentsStr += ";";
+                }
+                segmentsStr += to_string(seg.fStartHour) + "," + to_string(seg.fEndHour) + "," + to_string(seg.fPricePerHour);
+            }
+            
+            if(segmentsStr.empty()){
+                segmentsStr = "";
+            }
+            
+            string segCountStr = to_string(billing.nSegmentCount);
+            vector<const char*> segColumns = {"sPackageId", "sPackageName", "nUnitType", "fUnitPrice", "nSegmentCount", "sSegments", "nDel"};
+            vector<const char*> segValues = {
+                billing.sPackageId.c_str(),
+                billing.sPackageName.c_str(),
+                to_string(static_cast<int>(billing.nUnitType)).c_str(),
+                to_string(billing.fUnitPrice).c_str(),
+                segCountStr.c_str(),
+                segmentsStr.c_str(),
+                "0"
+            };
+            
+            if(billingdb.insert("billings", segColumns, segValues)){
+                cout << "添加套餐成功！" << endl;
+            } else {
+                cout << "添加失败：" << billingdb.getLastError() << endl;
+            }
+            return;
+        }
         break;
     }
 
@@ -119,12 +253,16 @@ void newstandard(void){
 
     string unitTypeStr = to_string(static_cast<int>(billing.nUnitType));
     string unitPriceStr = to_string(billing.fUnitPrice);
+    string segmentCountStr = to_string(billing.nSegmentCount);
     string delStr = to_string(billing.nDel);
-    vector<const char*> columns = {"sPackageId", "nUnitType", "fUnitPrice", "nDel"};
+    vector<const char*> columns = {"sPackageId", "sPackageName", "nUnitType", "fUnitPrice", "nSegmentCount", "sSegments", "nDel"};
     vector<const char*> values = {
         billing.sPackageId.c_str(),
+        billing.sPackageName.c_str(),
         unitTypeStr.c_str(),
         unitPriceStr.c_str(),
+        segmentCountStr.c_str(),
+        "",
         delStr.c_str()
     };
 
@@ -144,10 +282,10 @@ void searchstandard(void){
 
     vector<vector<string>> result;
     if(id.empty()){
-        result = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice, nDel FROM billings WHERE nDel=0");
+        result = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE nDel=0");
     } else {
         vector<const char*> params = {id.c_str()};
-        result = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
+        result = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
     }
 
     if(result.empty()){
@@ -155,12 +293,49 @@ void searchstandard(void){
         return;
     }
 
-    cout << "套餐编号\t计费单位\t单价\t状态" << endl;
+    cout << "套餐编号\t套餐名称\t\t计费模式\t计费单位\t单价\t状态" << endl;
+    string outputContent = "套餐编号,套餐名称,计费模式,计费单位,单价,状态\n";
     for(size_t i = 0; i < result.size(); i++){
         Billing billing = queryToBilling(result, i);
         string unitTypeStr = (billing.nUnitType == UnitType::MINUTE) ? "分钟" : "小时";
+        string modeStr = (billing.nSegmentCount > 0) ? "分段计费" : "简单计费";
         string statusStr = (billing.nDel == 0) ? "有效" : "失效";
-        cout << billing.sPackageId << "\t\t" << unitTypeStr << "\t" << billing.fUnitPrice << "\t" << statusStr << endl;
+        string line = billing.sPackageId + "\t" + billing.sPackageName + "\t\t" + modeStr + "\t\t" + unitTypeStr + "\t" + formatCurrency(billing.fUnitPrice) + "\t" + statusStr + "\n";
+        cout << line;
+        outputContent += billing.sPackageId + "," + billing.sPackageName + "," + modeStr + "," + unitTypeStr + "," + formatCurrency(billing.fUnitPrice) + "," + statusStr + "\n";
+        
+        if(billing.nSegmentCount > 0){
+            cout << "  分段详情：" << endl;
+            for(int j = 0; j < billing.nSegmentCount; j++){
+                BillingSegment& seg = billing.segments[j];
+                string endStr = (seg.fEndHour == -1) ? "无上限" : to_string(seg.fEndHour) + "小时";
+                cout << "    第" << (j+1) << "段: " << seg.fStartHour << "小时 ~ " << endStr << ", 单价: " << formatCurrency(seg.fPricePerHour) << "元/小时" << endl;
+            }
+        }
+    }
+
+    cout << "\n是否导出到文件？(y/n)：";
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+
+    if(choice == 'y' || choice == 'Y'){
+        time_t now = time(nullptr);
+        struct tm* timeinfo = localtime(&now);
+        char filename[64];
+        strftime(filename, sizeof(filename), "billing_standards_%Y%m%d_%H%M%S.csv", timeinfo);
+
+        string outputDir = OUTPUT_ROOT;
+        string filepath = outputDir + filename;
+        if(ensureDirectory(outputDir)){
+            if(saveToFile(filepath, outputContent)){
+                cout << "导出成功！文件保存至：" << filepath << endl;
+            } else {
+                cout << "导出失败！" << endl;
+            }
+        } else {
+            cout << "创建输出目录失败！" << endl;
+        }
     }
 }// 查询计费标准
 

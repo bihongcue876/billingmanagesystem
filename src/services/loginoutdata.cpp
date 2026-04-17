@@ -2,6 +2,7 @@
 #include <ctime>
 #include <string>
 #include <cmath>
+#include <algorithm>
 #include "loginoutdata.h"
 #include "database.h"
 #include "model.hpp"
@@ -38,6 +39,39 @@ static float calculateFee(time_t tStart, time_t tEnd, float fUnitPrice, UnitType
         fAmount = hours * fUnitPrice;
     }
     return fAmount;
+}
+
+static float calculateSegmentedFee(time_t tStart, time_t tEnd, Billing billing){
+    time_t duration = tEnd - tStart;
+    float hours = duration / 3600.0f;
+    
+    float totalFee = 0.0f;
+    float remainingHours = hours;
+    
+    for(int i = 0; i < billing.nSegmentCount && remainingHours > 0; i++){
+        BillingSegment& seg = billing.segments[i];
+        
+        float segStart = seg.fStartHour;
+        float segEnd = (seg.fEndHour == -1) ? remainingHours : seg.fEndHour;
+        
+        if(hours <= segStart){
+            continue;
+        }
+        
+        float billableHours;
+        if(segEnd == -1){
+            billableHours = hours - segStart;
+        } else {
+            billableHours = min(segEnd, hours) - segStart;
+        }
+        
+        if(billableHours > 0){
+            billableHours = ceil(billableHours);
+            totalFee += billableHours * seg.fPricePerHour;
+        }
+    }
+    
+    return totalFee;
 }
 
 static string getLogTableName(){
@@ -227,19 +261,28 @@ int logout(const char* cardname){
     // 获取套餐计费标准
     float fUnitPrice = 0.1f;
     UnitType nUnitType = UnitType::MINUTE;
+    Billing billing;
+    billing.nSegmentCount = 0;
+    billing.fUnitPrice = 0.1f;
+    
     if(log.nPackageId != 0){
         initbilling();
         string packageIdStr = to_string(log.nPackageId);
         vector<const char*> billingParams = {packageIdStr.c_str()};
-        vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice FROM billings WHERE sPackageId=? AND nDel=0", billingParams);
+        vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE sPackageId=? AND nDel=0", billingParams);
         if(!billingResult.empty()){
-            Billing billing = queryToBilling(billingResult, 0);
+            billing = queryToBilling(billingResult, 0);
             fUnitPrice = billing.fUnitPrice;
             nUnitType = billing.nUnitType;
         }
     }
 
-    float fAmount = calculateFee(log.tStart, now, fUnitPrice, nUnitType);
+    float fAmount;
+    if(billing.nSegmentCount > 0){
+        fAmount = calculateSegmentedFee(log.tStart, now, billing);
+    } else {
+        fAmount = calculateFee(log.tStart, now, fUnitPrice, nUnitType);
+    }
     float fNewBalance = round((acc.fBalance - fAmount) * 100.0f) / 100.0f;
 
     // 更新上机日志记录

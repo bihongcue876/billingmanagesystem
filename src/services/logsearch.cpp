@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <fstream>
+#include <cstdlib>
 #include <conio.h>
 #include "logsearch.h"
 #include "financedatabase.h"
@@ -95,6 +97,7 @@ void totalsales(void){
     
     cout << "ID\t卡号\t\t类型\t金额\t\t备注\t\t时间" << endl;
     cout << "------------------------------------------------------------------------" << endl;
+    string outputContent = "ID,卡号,类型,金额,备注,时间\n";
     for(const auto& trans : allTransactions){
         string typeStr;
         if(trans.type == 1) {
@@ -107,16 +110,45 @@ void totalsales(void){
             typeStr = "消费";
             totalConsumption += trans.amount;
         }
-        cout << trans.id << "\t" << trans.cardId << "\t" << typeStr << "\t" 
-             << trans.amount << "\t" << trans.remark << "\t" << trans.time << endl;
+        string line = to_string(trans.id) + "\t" + trans.cardId + "\t" + typeStr + "\t" 
+                    + formatCurrency(trans.amount) + "\t" + trans.remark + "\t" + trans.time + "\n";
+        cout << line;
+        outputContent += to_string(trans.id) + "," + trans.cardId + "," + typeStr + "," 
+                       + formatCurrency(trans.amount) + "," + trans.remark + "," + trans.time + "\n";
     }
     
     cout << "------------------------------------------------------------------------" << endl;
-    cout << "\n=== 统计汇总 ===" << endl;
-    cout << "充值总额：" << formatCurrency(totalRecharge) << " 元" << endl;
-    cout << "退费总额：" << formatCurrency(totalRefund) << " 元" << endl;
-    cout << "消费总额：" << formatCurrency(totalConsumption) << " 元" << endl;
-    cout << "实际营收：" << formatCurrency(totalRecharge - totalRefund) << " 元" << endl;
+    string summary = "\n=== 统计汇总 ===\n";
+    summary += "充值总额：" + formatCurrency(totalRecharge) + " 元\n";
+    summary += "退费总额：" + formatCurrency(totalRefund) + " 元\n";
+    summary += "消费总额：" + formatCurrency(totalConsumption) + " 元\n";
+    summary += "实际营收：" + formatCurrency(totalRecharge - totalRefund) + " 元\n";
+    cout << summary;
+    outputContent += summary;
+
+    cout << "\n是否导出到文件？(y/n)：";
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+
+    if(choice == 'y' || choice == 'Y'){
+        time_t now = time(nullptr);
+        struct tm* timeinfo = localtime(&now);
+        char filename[64];
+        strftime(filename, sizeof(filename), "totalsales_%Y%m%d_%H%M%S.csv", timeinfo);
+
+        string outputDir = OUTPUT_ROOT;
+        string filepath = outputDir + filename;
+        if(ensureDirectory(outputDir)){
+            if(saveToFile(filepath, outputContent)){
+                cout << "导出成功！文件保存至：" << filepath << endl;
+            } else {
+                cout << "导出失败！" << endl;
+            }
+        } else {
+            cout << "创建输出目录失败！" << endl;
+        }
+    }
 }
 
 // 上下机日志 - 显示所有上下机记录
@@ -138,6 +170,7 @@ void uselogs(void){
     
     cout << "ID\t卡号\t\t上机时间\t\t下机时间\t\t消费金额\t余额\t套餐" << endl;
     cout << "--------------------------------------------------------------------------------" << endl;
+    string outputContent = "ID,卡号,上机时间,下机时间,消费金额,余额,套餐\n";
     
     for(size_t i = 0; i < result.size(); i++){
         const vector<string>& row = result[i];
@@ -156,8 +189,35 @@ void uselogs(void){
         
         string packageStr = (row[6] == "0") ? "无" : row[6];
         
-        cout << row[0] << "\t" << row[1] << "\t" << startTime << "\t" << endTime << "\t" 
-             << row[4] << "\t" << row[5] << "\t" << packageStr << endl;
+        string line = row[0] + "\t" + row[1] + "\t" + startTime + "\t" + endTime + "\t" 
+                    + formatCurrency(stof(row[4])) + "\t" + formatCurrency(stof(row[5])) + "\t" + packageStr + "\n";
+        cout << line;
+        outputContent += row[0] + "," + row[1] + "," + startTime + "," + endTime + "," 
+                      + formatCurrency(stof(row[4])) + "," + formatCurrency(stof(row[5])) + "," + packageStr + "\n";
+    }
+
+    cout << "\n是否导出到文件？(y/n)：";
+    char choice;
+    cin >> choice;
+    cin.ignore(1024, '\n');
+
+    if(choice == 'y' || choice == 'Y'){
+        time_t now = time(nullptr);
+        struct tm* timeinfo = localtime(&now);
+        char filename[64];
+        strftime(filename, sizeof(filename), "uselogs_%Y%m%d_%H%M%S.csv", timeinfo);
+
+        string outputDir = OUTPUT_ROOT;
+        string filepath = outputDir + filename;
+        if(ensureDirectory(outputDir)){
+            if(saveToFile(filepath, outputContent)){
+                cout << "导出成功！文件保存至：" << filepath << endl;
+            } else {
+                cout << "导出失败！" << endl;
+            }
+        } else {
+            cout << "创建输出目录失败！" << endl;
+        }
     }
 }
 

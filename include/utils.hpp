@@ -281,4 +281,22 @@ inline char showMenu(
     return readOption();
 }
 
+#include <fstream>
+#include <cstdlib>
+
+inline bool ensureDirectory(const std::string& path) {
+    std::string cmd = "mkdir -p " + path;
+    return system(cmd.c_str()) == 0;
+}
+
+inline bool saveToFile(const std::string& filepath, const std::string& content) {
+    std::ofstream outFile(filepath);
+    if (!outFile.is_open()) {
+        return false;
+    }
+    outFile << content;
+    outFile.close();
+    return true;
+}
+
 #endif // UTILS_HPP

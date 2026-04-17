@@ -14,17 +14,19 @@ using namespace std;
 sqlitedb billingdb(DATA_ROOT"billing.db");
 
 void initbilling(){
-    const char* columnDefs = "sPackageId TEXT PRIMARY KEY, nUnitType INTEGER, fUnitPrice REAL, nDel INTEGER";
+    const char* columnDefs = "sPackageId TEXT PRIMARY KEY, sPackageName TEXT, nUnitType INTEGER, fUnitPrice REAL, nSegmentCount INTEGER, sSegments TEXT, nDel INTEGER";
     billingdb.tablecreate("billings", columnDefs);
     
     // 检查默认套餐"0"是否存在，不存在则创建
     vector<vector<string>> checkResult = billingdb.query("SELECT sPackageId FROM billings WHERE sPackageId='0'");
     if(checkResult.empty()){
-        vector<const char*> columns = {"sPackageId", "nUnitType", "fUnitPrice", "nDel"};
+        vector<const char*> columns = {"sPackageId", "sPackageName", "nUnitType", "fUnitPrice", "nSegmentCount", "sSegments", "nDel"};
         string unitTypeStr = to_string(static_cast<int>(UnitType::MINUTE));
         string unitPriceStr = to_string(0.1f);
+        string segmentCountStr = to_string(0);
+        string segmentsStr = "";
         string delStr = to_string(0);
-        vector<const char*> values = {"0", unitTypeStr.c_str(), unitPriceStr.c_str(), delStr.c_str()};
+        vector<const char*> values = {"0", "默认套餐", unitTypeStr.c_str(), unitPriceStr.c_str(), segmentCountStr.c_str(), segmentsStr.c_str(), delStr.c_str()};
         billingdb.insert("billings", columns, values);
     }
 }
@@ -121,10 +123,10 @@ bool searchstnd(const string& id){
     
     vector<vector<string>> result;
     if(id.empty()){
-        result = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice, nDel FROM billings WHERE nDel=0");
+        result = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE nDel=0");
     } else {
         vector<const char*> params = {id.c_str()};
-        result = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
+        result = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
     }
     
     if(result.empty()){
@@ -146,7 +148,7 @@ bool changestnd(const std::string& id){
     initbilling();
     
     vector<const char*> params = {id.c_str()};
-    vector<vector<string>> result = billingdb.query("SELECT sPackageId, nUnitType, fUnitPrice, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
+    vector<vector<string>> result = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments, nDel FROM billings WHERE sPackageId=? AND nDel=0", params);
     if(result.empty()){
         cout << "套餐不存在或已失效！" << endl;
         return false;
@@ -252,19 +254,51 @@ bool deletestnd(const string& id){
 Billing queryToBilling(const vector<vector<string>>& result, int index){
     Billing billing;
     billing.sPackageId = "";
+    billing.sPackageName = "";
     billing.nUnitType = UnitType::MINUTE;
     billing.fUnitPrice = 0.0f;
+    billing.nSegmentCount = 0;
+    for(int i = 0; i < MAX_SEGMENTS; i++) {
+        billing.segments[i].fStartHour = 0;
+        billing.segments[i].fEndHour = 0;
+        billing.segments[i].fPricePerHour = 0;
+    }
     billing.nDel = 0;
     
     if(index >= 0 && index < result.size()){
         const auto& row = result[index];
-        if(row.size() >= 4){
+        if(row.size() >= 7){
             try {
                 billing.sPackageId = row[0];
-                int unitTypeValue = stoi(row[1]);
+                billing.sPackageName = row[1];
+                int unitTypeValue = stoi(row[2]);
                 billing.nUnitType = static_cast<UnitType>(unitTypeValue);
-                billing.fUnitPrice = stof(row[2]);
-                billing.nDel = stoi(row[3]);
+                billing.fUnitPrice = stof(row[3]);
+                billing.nSegmentCount = stoi(row[4]);
+                
+                // 解析分段数据 JSON格式: start1,end1,price1;start2,end2,price2;...
+                if(!row[5].empty() && billing.nSegmentCount > 0) {
+                    string segmentsStr = row[5];
+                    int segIndex = 0;
+                    size_t pos = 0;
+                    while(segIndex < MAX_SEGMENTS && pos < segmentsStr.size()) {
+                        size_t comma1 = segmentsStr.find(',', pos);
+                        if(comma1 == string::npos) break;
+                        size_t comma2 = segmentsStr.find(',', comma1 + 1);
+                        if(comma2 == string::npos) break;
+                        size_t semicolon = segmentsStr.find(';', comma2);
+                        if(semicolon == string::npos) semicolon = segmentsStr.size();
+                        
+                        billing.segments[segIndex].fStartHour = stof(segmentsStr.substr(pos, comma1 - pos));
+                        billing.segments[segIndex].fEndHour = stof(segmentsStr.substr(comma1 + 1, comma2 - comma1 - 1));
+                        billing.segments[segIndex].fPricePerHour = stof(segmentsStr.substr(comma2 + 1, semicolon - comma2 - 1));
+                        
+                        pos = semicolon + 1;
+                        segIndex++;
+                    }
+                }
+                
+                billing.nDel = stoi(row[6]);
             } catch (const std::exception& e) {
                 // 数据格式错误，返回零初始化的对象
             }

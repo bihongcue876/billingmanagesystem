@@ -10,6 +10,9 @@
 // 默认数据库根目录路径
 #define DATA_ROOT "data\\"
 
+// 默认输出文件根目录路径
+#define OUTPUT_ROOT "output\\"
+
 // SQLite 回调函数（未使用）
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);
 
