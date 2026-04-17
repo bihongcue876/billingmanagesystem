@@ -144,7 +144,7 @@ int login(const char* cardname){
 
     // 显示可用套餐并让管理员选择
     initbilling();
-    vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount FROM billings WHERE nDel=0");
+    vector<vector<string>> billingResult = billingdb.query("SELECT sPackageId, sPackageName, nUnitType, fUnitPrice, nSegmentCount, sSegments FROM billings WHERE nDel=0");
     string packageId;
 
     if(billingResult.empty()){
